@@ -267,6 +267,18 @@
     display: flex; flex-direction: column; gap: 11px;
   }
   .ctl-group { display: flex; flex-direction: column; gap: 7px; }
+  .loc-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 5px; }
+  .loc-row input {
+    font-family: var(--mono); font-size: 11px; color: var(--ink);
+    background: rgba(255,255,255,.04); border: 1px solid var(--chrome);
+    border-radius: 5px; padding: 5px 7px; min-width: 0;
+  }
+  .loc-row input:focus {
+    outline: none; border-color: var(--mid); background: rgba(127,178,229,.08);
+  }
+  .loc-err {
+    font-size: 9.5px; color: var(--alert); margin-top: 5px; line-height: 1.5;
+  }
 
   .ctl-l {
     font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
@@ -374,6 +386,22 @@
 
   <div class="drawer-body">
     <div class="ctl-group">
+      <div class="ctl-l"><span>Location</span><span class="ctl-v" id="loc-name">Fairborn, OH</span></div>
+      <form id="loc-form" autocomplete="off">
+        <div class="loc-row">
+          <input type="text" id="loc-lat" inputmode="decimal" aria-label="Latitude" placeholder="lat" value="39.8209">
+          <input type="text" id="loc-lon" inputmode="decimal" aria-label="Longitude" placeholder="lon" value="-84.0194">
+          <button type="submit" class="chip" id="loc-go">go</button>
+        </div>
+        <div class="loc-err" id="loc-err" hidden></div>
+      </form>
+      <div class="ctl-row">
+        <button type="button" class="chip" id="loc-home">home</button>
+        <button type="button" class="chip" id="loc-here">use my location</button>
+      </div>
+    </div>
+
+    <div class="ctl-group">
       <div class="ctl-l"><label for="radius">Radius</label><span class="ctl-v" id="radius-v">60 nm</span></div>
       <input type="range" id="radius" min="10" max="120" step="5" value="60">
     </div>
@@ -409,6 +437,8 @@
   var SVG = "http://www.w3.org/2000/svg";
   var CX = 280, CY = 280, R = 246;
   var MAX_NM = 60;        // view radius, driven by the Radius slider
+  var HOME = { lat: 39.8209, lon: -84.0194 };
+  var centre = { lat: HOME.lat, lon: HOME.lon };
   var showGrid = true;
   var POLL_MS = 5000;
 
@@ -890,13 +920,18 @@
   }
 
   function tick() {
-    fetch("/api/flights", { cache: "no-store" })
+    fetch("/api/flights?lat=" + centre.lat + "&lon=" + centre.lon, { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
         return r.json();
       })
       .then(function (d) {
         render(d.aircraft || []);
+        if (d.center && d.center.name) {
+          document.getElementById("loc-name").textContent = d.center.name;
+          document.getElementById("sub-coords").textContent =
+            d.center.name + " · " + MAX_NM + " nm";
+        }
         pulseEl.className = "pulse live";
         var t = new Date((d.now || Date.now() / 1000) * 1000);
         statusEl.textContent = "live · " + d.source + " · " +
@@ -978,6 +1013,69 @@
     });
   }
 
+  var locLat = document.getElementById("loc-lat");
+  var locLon = document.getElementById("loc-lon");
+  var locErr = document.getElementById("loc-err");
+
+  function moveTo(lat, lon) {
+    centre.lat = Math.round(lat * 10000) / 10000;
+    centre.lon = Math.round(lon * 10000) / 10000;
+    locLat.value = centre.lat;
+    locLon.value = centre.lon;
+    locErr.hidden = true;
+    // The chart is relative to the centre, so old positions and tracks no
+    // longer apply -- clear rather than show stale geometry.
+    selected = null;
+    lastAircraft = [];
+    render([]);
+    statusEl.textContent = "moving…";
+    tick();
+  }
+
+  document.getElementById("loc-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var lat = parseFloat(locLat.value);
+    var lon = parseFloat(locLon.value);
+    if (isNaN(lat) || isNaN(lon)) {
+      locErr.textContent = "Enter numbers, e.g. 39.8209 and -84.0194.";
+      locErr.hidden = false;
+      return;
+    }
+    if (lat < -90 || lat > 90) {
+      locErr.textContent = "Latitude must be between -90 and 90.";
+      locErr.hidden = false;
+      return;
+    }
+    if (lon < -180 || lon > 180) {
+      locErr.textContent = "Longitude must be between -180 and 180.";
+      locErr.hidden = false;
+      return;
+    }
+    moveTo(lat, lon);
+  });
+
+  document.getElementById("loc-home").addEventListener("click", function () {
+    moveTo(HOME.lat, HOME.lon);
+  });
+
+  document.getElementById("loc-here").addEventListener("click", function () {
+    if (!navigator.geolocation) {
+      locErr.textContent = "This browser has no location service.";
+      locErr.hidden = false;
+      return;
+    }
+    locErr.textContent = "Asking your browser for a location…";
+    locErr.hidden = false;
+    navigator.geolocation.getCurrentPosition(
+      function (pos) { moveTo(pos.coords.latitude, pos.coords.longitude); },
+      function () {
+        locErr.textContent = "Could not get your location. Enter it manually above.";
+        locErr.hidden = false;
+      },
+      { timeout: 10000 }
+    );
+  });
+
   var radiusEl = document.getElementById("radius");
   var radiusV = document.getElementById("radius-v");
   var gridTog = document.getElementById("gridtog");
@@ -1023,7 +1121,7 @@
     MAX_NM = Number(radiusEl.value);
     radiusV.textContent = MAX_NM + " nm";
     document.getElementById("sub-coords").textContent =
-      "39.82°N 84.02°W · " + MAX_NM + " nm";
+      document.getElementById("loc-name").textContent + " · " + MAX_NM + " nm";
     // "Within 15 nm" stops meaning much once the view is tighter than that.
     document.querySelector("#n-near").nextElementSibling.textContent =
       MAX_NM <= 20 ? "Within 5 nm" : "Within 15 nm";
@@ -1068,7 +1166,8 @@
   document.getElementById("reset").addEventListener("click", function () {
     rotation = 0; rotEl.value = 0; rotV.textContent = rotLabel();
     MAX_NM = 60; radiusEl.value = 60; radiusV.textContent = "60 nm";
-    document.getElementById("sub-coords").textContent = "39.82°N 84.02°W · 60 nm";
+    document.getElementById("sub-coords").textContent =
+      document.getElementById("loc-name").textContent + " · 60 nm";
     document.querySelector("#n-near").nextElementSibling.textContent = "Within 15 nm";
     if (!showGrid) { showGrid = true; gridTog.classList.add("on"); gridTog.setAttribute("aria-pressed","true"); }
     if (!mirrored) mirrorEl.click(); else redraw();

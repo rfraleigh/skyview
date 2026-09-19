@@ -43,7 +43,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 app = FastAPI(title="Sky View over Fairborn")
 
-_cache: dict[str, object] = {"at": 0.0, "payload": None}
+_cache: dict[str, object] = {"at": 0.0, "payload": None, "key": None}
 CACHE_SECONDS = 4.0  # stay under adsb.fi's 1 req/sec even with many viewers
 
 # The upstreams serve snapshots, not history -- there is no public trace endpoint.
@@ -77,7 +77,7 @@ def _record_tracks(rows: list[dict], now: float) -> None:
             _tracks.pop(hex_id, None)
 
 
-async def _fetch_upstream(client: httpx.AsyncClient) -> tuple[str, list[dict]]:
+async def _fetch_upstream(client: httpx.AsyncClient, clat: float, clon: float) -> tuple[str, list[dict]]:
     if READSB_URL:
         response = await client.get(READSB_URL, timeout=8.0)
         response.raise_for_status()
@@ -85,7 +85,7 @@ async def _fetch_upstream(client: httpx.AsyncClient) -> tuple[str, list[dict]]:
 
     errors = []
     for name, template, key in UPSTREAMS:
-        url = template.format(lat=FAIRBORN_LAT, lon=FAIRBORN_LON, dist=FETCH_RADIUS_NM)
+        url = template.format(lat=clat, lon=clon, dist=FETCH_RADIUS_NM)
         try:
             response = await client.get(url, timeout=8.0)
             response.raise_for_status()
@@ -95,20 +95,32 @@ async def _fetch_upstream(client: httpx.AsyncClient) -> tuple[str, list[dict]]:
     raise HTTPException(status_code=502, detail="All upstreams failed: " + "; ".join(errors))
 
 
-def _polar(lat: float, lon: float) -> tuple[float, float]:
-    """Bearing (deg true) and distance (nm) from Fairborn to a point.
+def _place_name(lat: float, lon: float) -> str:
+    """Label the chart centre using the nearest known airport, if any."""
+    if abs(lat - FAIRBORN_LAT) < 0.02 and abs(lon - FAIRBORN_LON) < 0.02:
+        return "Fairborn, OH"
+    near = apt.nearest_airport(lat, lon, max_nm=25.0)
+    if near:
+        airport, dist = near
+        where = airport.municipality or airport.name
+        return f"{where} ({airport.ident}, {dist:.0f} nm)"
+    return f"{lat:.3f}, {lon:.3f}"
+
+
+def _polar(lat: float, lon: float, clat: float, clon: float) -> tuple[float, float]:
+    """Bearing (deg true) and distance (nm) from the chart centre to a point.
 
     Equirectangular approximation -- accurate well within a degree at these
     ranges, and far cheaper than haversine for every point of every track.
     """
-    lat_rad = math.radians((lat + FAIRBORN_LAT) / 2)
-    dy = (lat - FAIRBORN_LAT) * 60.0
-    dx = (lon - FAIRBORN_LON) * 60.0 * math.cos(lat_rad)
+    lat_rad = math.radians((lat + clat) / 2)
+    dy = (lat - clat) * 60.0
+    dx = (lon - clon) * 60.0 * math.cos(lat_rad)
     bearing = (math.degrees(math.atan2(dx, dy)) + 360.0) % 360.0
     return bearing, math.hypot(dx, dy)
 
 
-def _clean(rows: list[dict]) -> list[dict]:
+def _clean(rows: list[dict], clat: float, clon: float) -> list[dict]:
     """Keep airborne contacts that have a usable position."""
     out = []
     for a in rows:
@@ -117,6 +129,9 @@ def _clean(rows: list[dict]) -> list[dict]:
             continue
         if a.get("lat") is None or a.get("lon") is None:
             continue
+        # Recomputed against the viewer's centre -- the upstream's own dst/dir
+        # are relative to the point we queried, which may differ.
+        bearing, distance = _polar(a["lat"], a["lon"], clat, clon)
         out.append(
             {
                 "hex": a.get("hex"),
@@ -131,8 +146,8 @@ def _clean(rows: list[dict]) -> list[dict]:
                 "baro_rate": a.get("baro_rate"),
                 "squawk": a.get("squawk"),
                 "emergency": a.get("emergency"),
-                "dst": a.get("dst"),
-                "dir": a.get("dir"),
+                "dst": round(distance, 3),
+                "dir": round(bearing, 2),
                 "category": a.get("category"),
                 # Intent, not just state: the altitude the crew has dialled in,
                 # and the autopilot modes they have armed.
@@ -149,7 +164,7 @@ def _clean(rows: list[dict]) -> list[dict]:
                 "track_pts": [
                     {"dir": b, "dst": d, "alt": alt_p}
                     for b, d, alt_p in (
-                        (*_polar(pt[0], pt[1]), pt[2]) for pt in _tracks.get(a.get("hex"), ())
+                        (*_polar(pt[0], pt[1], clat, clon), pt[2]) for pt in _tracks.get(a.get("hex"), ())
                     )
                 ],
             }
@@ -159,25 +174,35 @@ def _clean(rows: list[dict]) -> list[dict]:
 
 
 @app.get("/api/flights")
-async def flights():
+async def flights(lat: float | None = None, lon: float | None = None):
+    clat = FAIRBORN_LAT if lat is None else max(-90.0, min(90.0, lat))
+    clon = FAIRBORN_LON if lon is None else max(-180.0, min(180.0, lon))
+
     now = time.time()
-    if _cache["payload"] is not None and now - float(_cache["at"]) < CACHE_SECONDS:
+    # Cache per location, so panning somewhere new always fetches.
+    key = (round(clat, 3), round(clon, 3))
+    if (
+        _cache["payload"] is not None
+        and _cache["key"] == key
+        and now - float(_cache["at"]) < CACHE_SECONDS
+    ):
         return _cache["payload"]
 
     async with httpx.AsyncClient(headers={"User-Agent": "skyview-fairborn/1.0"}) as client:
-        source, rows = await _fetch_upstream(client)
+        source, rows = await _fetch_upstream(client, clat, clon)
 
     _record_tracks(rows, now)
 
     payload = {
         "now": now,
         "source": source,
-        "center": {"lat": FAIRBORN_LAT, "lon": FAIRBORN_LON, "name": "Fairborn, OH"},
+        "center": {"lat": clat, "lon": clon, "name": _place_name(clat, clon)},
         "radius_nm": DEFAULT_RADIUS_NM,
         "fetch_radius_nm": FETCH_RADIUS_NM,
-        "aircraft": _clean(rows),
+        "aircraft": _clean(rows, clat, clon),
     }
     _cache["at"] = now
+    _cache["key"] = key
     _cache["payload"] = payload
     return JSONResponse(payload)
 

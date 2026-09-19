@@ -28,6 +28,23 @@ tick shows heading.
 - **Operator filters** — comm / civil / mil. See the caveat below.
 - **Phase filters** — dep ↑ / arr ↓ / cruise, from vertical rate.
 
+## Changing location
+
+The Controls drawer takes a lat/lon and re-centres the chart, with a **home**
+button back to Fairborn and **use my location** via the browser geolocation
+prompt. The centre is a query parameter (`/api/flights?lat=&lon=`), and
+responses are cached per location.
+
+Bearings and distances are recomputed against the chosen centre rather than
+reusing the upstream's own `dst`/`dir`, which are relative to the point the
+server queried.
+
+Note that the bundled airport data covers a 90 nm box around Fairborn, so
+approach detection and place names only work near home. Further afield the
+chart still works, but the location shows as bare coordinates and no approach
+matching happens. Re-run `scripts/refresh_airports.py` with different
+constants to move that box.
+
 ## Tracks
 
 The upstreams serve snapshots, not history, and there is no public trace
