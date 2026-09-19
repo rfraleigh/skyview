@@ -59,6 +59,20 @@ outline, the compass to 23px, rings and spokes brighten, aircraft glyphs grow
 the labels at the same luminance. Label de-confliction spacing scales with
 the larger type.
 
+## Text size
+
+Two independent scales in the Controls drawer, each remembered per browser:
+
+- **Panel text** (80-220%) sizes the side panels and their controls. Also
+  bound to **Ctrl +** / **Ctrl -**, with **Ctrl 0** resetting both scales.
+- **Marker text** (80-300%) sizes the callsigns, altitudes, compass and ring
+  labels on the chart itself.
+
+They are separate because a ceiling projection usually wants large chart
+labels but not a side panel that eats the screen. Label de-confliction
+spacing follows the marker scale, so bigger text still separates cleanly, and
+the drawers widen with the panel scale rather than truncating their contents.
+
 ## Street map
 
 The **streets** chip draws OpenStreetMap tiles under the chart, clipped to the

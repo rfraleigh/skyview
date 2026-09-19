@@ -24,6 +24,12 @@
     --mid: #7FB2E5;
     --high: #CFE8FF;
     --alert: #E5484D;
+    /* Two independent type scales: --ui-scale sizes the side panels and
+       their controls, --chart-scale sizes the labels on the chart itself.
+       Panels scale via a font-size on their root plus em-based sizes; chart
+       text is SVG, so it multiplies explicit px values instead. */
+    --ui-scale: 1;
+    --chart-scale: 1;
     --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     --ui: "Inter Tight", system-ui, -apple-system, Segoe UI, sans-serif;
   }
@@ -76,20 +82,20 @@
   .with-map .spoke { stroke: #2C3652; }
   .ring.major { stroke: var(--ring); }
   .ring-label {
-    fill: var(--ink-faint); font-family: var(--mono); font-size: 9px;
+    fill: var(--ink-faint); font-family: var(--mono); font-size: calc(9px * var(--chart-scale));
     letter-spacing: .04em;
   }
   .spoke { stroke: var(--ring-faint); stroke-width: 1; }
   .compass {
-    fill: #56678A; font-family: var(--ui); font-size: 13px;
+    fill: #56678A; font-family: var(--ui); font-size: calc(13px * var(--chart-scale));
     font-weight: 600; letter-spacing: .12em; text-anchor: middle;
   }
-  .compass.cardinal { fill: #8195BC; font-size: 15px; }
+  .compass.cardinal { fill: #8195BC; font-size: calc(15px * var(--chart-scale)); }
 
   .center-dot { fill: var(--ink); }
   .center-ring { fill: none; stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 3; }
   .center-label {
-    fill: var(--ink-dim); font-family: var(--mono); font-size: 9px;
+    fill: var(--ink-dim); font-family: var(--mono); font-size: calc(9px * var(--chart-scale));
     text-anchor: middle; letter-spacing: .08em;
   }
 
@@ -97,12 +103,12 @@
   .ac-body { stroke-width: 1.25; }
   .ac-lead { stroke-width: 1.5; stroke-linecap: round; opacity: .75; }
   .ac-label {
-    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    font-family: var(--mono); font-size: calc(10px * var(--chart-scale)); font-weight: 700;
     letter-spacing: .02em; paint-order: stroke;
     stroke: var(--ground); stroke-width: 3px; stroke-linejoin: round;
   }
   .ac-sub {
-    font-family: var(--mono); font-size: 8.5px; fill: var(--ink-faint);
+    font-family: var(--mono); font-size: calc(8.5px * var(--chart-scale)); fill: var(--ink-faint);
     paint-order: stroke; stroke: var(--ground); stroke-width: 3px;
   }
   .ac.sel .ac-label { fill: #fff; }
@@ -111,8 +117,10 @@
 
   /* ---- rail ---- */
   #rail {
+    font-size: calc(14px * var(--ui-scale));
     position: fixed; z-index: 50;
-    top: 0; bottom: 0; right: 0; width: 320px;
+    top: 0; bottom: 0; right: 0;
+    width: min(92vw, calc(320px * var(--ui-scale)));
     background: #04060B;
     border-left: 1px solid var(--chrome);
     display: flex; flex-direction: column;
@@ -128,7 +136,7 @@
   }
   #rail-close {
     background: none; border: 0; color: var(--ink-faint);
-    font-size: 21px; line-height: 1; cursor: pointer; padding: 0 2px;
+    font-size: 1.5em; line-height: 1; cursor: pointer; padding: 0 2px;
   }
   #rail-close:hover { color: var(--ink); }
   #rail-close:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
@@ -136,7 +144,7 @@
   #rail-open {
     position: absolute; right: 22px; top: 22px;
     display: flex; align-items: center; gap: 8px;
-    font-family: var(--ui); font-size: 11px; font-weight: 500;
+    font-family: var(--ui); font-size: 0.7857em; font-weight: 500;
     letter-spacing: .04em; color: var(--ink-dim);
     background: rgba(8,11,20,.82); backdrop-filter: blur(6px);
     border: 1px solid var(--chrome); border-radius: 7px;
@@ -145,7 +153,7 @@
   #rail-open:hover { color: var(--ink); border-color: var(--ring); }
   #rail-open:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
   .rail-count {
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    font-family: var(--mono); font-size: 0.7857em; font-weight: 700;
     color: var(--high); font-variant-numeric: tabular-nums;
   }
   .rail-head {
@@ -153,19 +161,19 @@
     border-bottom: 1px solid var(--chrome);
   }
   h1 {
-    margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+    margin: 0; font-size: 1.0714em; font-weight: 600; letter-spacing: -.01em;
   }
   .sub {
-    margin: 4px 0 0; font-family: var(--mono); font-size: 10px;
+    margin: 4px 0 0; font-family: var(--mono); font-size: 0.7143em;
     color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase;
   }
   .stats { display: flex; gap: 18px; margin-top: 14px; }
   .stat-n {
-    font-family: var(--mono); font-size: 22px; font-weight: 700;
+    font-family: var(--mono); font-size: 1.5714em; font-weight: 700;
     line-height: 1; font-variant-numeric: tabular-nums;
   }
   .stat-l {
-    font-size: 9px; color: var(--ink-faint); text-transform: uppercase;
+    font-size: 0.6429em; color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: .1em; margin-top: 5px;
   }
   #list { overflow-y: auto; flex: 1; min-height: 0; }
@@ -179,15 +187,15 @@
   .row.sel { background: rgba(127,178,229,.13); }
   .swatch { width: 8px; height: 8px; border-radius: 50%; }
   .call {
-    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    font-family: var(--mono); font-size: 0.8571em; font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
   .meta {
-    font-size: 10px; color: var(--ink-faint); margin-top: 2px;
+    font-size: 0.7143em; color: var(--ink-faint); margin-top: 2px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .nums {
-    text-align: right; font-family: var(--mono); font-size: 10px;
+    text-align: right; font-family: var(--mono); font-size: 0.7143em;
     color: var(--ink-dim); font-variant-numeric: tabular-nums; line-height: 1.5;
   }
   #detail {
@@ -196,30 +204,30 @@
     padding: 12px 13px 13px;
   }
   .d-call {
-    font-family: var(--mono); font-size: 14px; font-weight: 700;
+    font-family: var(--mono); font-size: 1.0em; font-weight: 700;
     display: flex; align-items: baseline; gap: 8px;
   }
-  .d-desc { font-size: 11px; color: var(--ink-dim); margin-top: 3px; }
+  .d-desc { font-size: 0.7857em; color: var(--ink-dim); margin-top: 3px; }
   .d-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 9px 8px; margin-top: 11px;
   }
   .d-k {
-    font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
+    font-size: 0.6071em; color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: .09em;
   }
   .d-v {
-    font-family: var(--mono); font-size: 12px; margin-top: 2px;
+    font-family: var(--mono); font-size: 0.8571em; margin-top: 2px;
     font-variant-numeric: tabular-nums;
   }
   .d-track {
     margin-top: 11px; padding-top: 10px;
     border-top: 1px solid rgba(42,58,92,.5);
-    font-size: 10px; color: var(--ink-faint); line-height: 1.55;
+    font-size: 0.7143em; color: var(--ink-faint); line-height: 1.55;
   }
   .rail-foot {
     padding: 11px 18px; border-top: 1px solid var(--chrome);
-    font-size: 10px; color: var(--ink-faint);
+    font-size: 0.7143em; color: var(--ink-faint);
     display: flex; justify-content: space-between; align-items: center;
   }
   .rail-foot a { color: var(--ink-dim); }
@@ -235,7 +243,7 @@
   #drawer-open {
     position: absolute; left: 22px; top: 22px;
     display: flex; align-items: center; gap: 8px;
-    font-family: var(--ui); font-size: 11px; font-weight: 500;
+    font-family: var(--ui); font-size: 0.7857em; font-weight: 500;
     letter-spacing: .04em; color: var(--ink-dim);
     background: rgba(8,11,20,.82); backdrop-filter: blur(6px);
     border: 1px solid var(--chrome); border-radius: 7px;
@@ -257,8 +265,10 @@
      over a chart that stays interactive. */
 
   #drawer {
+    font-size: calc(14px * var(--ui-scale));
     position: fixed; z-index: 50;
-    top: 0; bottom: 0; left: 0; width: 290px;
+    top: 0; bottom: 0; left: 0;
+    width: min(92vw, calc(290px * var(--ui-scale)));
     background: #04060B;
     border-right: 1px solid var(--chrome);
     display: flex; flex-direction: column;
@@ -273,12 +283,12 @@
     padding: 16px 18px 13px; border-bottom: 1px solid var(--chrome);
   }
   .drawer-title {
-    font-size: 12px; font-weight: 600; letter-spacing: .09em;
+    font-size: 0.8571em; font-weight: 600; letter-spacing: .09em;
     text-transform: uppercase; color: var(--ink-dim);
   }
   #drawer-close {
     background: none; border: 0; color: var(--ink-faint);
-    font-size: 21px; line-height: 1; cursor: pointer; padding: 0 2px;
+    font-size: 1.5em; line-height: 1; cursor: pointer; padding: 0 2px;
   }
   #drawer-close:hover { color: var(--ink); }
   #drawer-close:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
@@ -288,8 +298,13 @@
   }
   .ctl-group { display: flex; flex-direction: column; gap: 7px; }
   .loc-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 5px; }
+  /* Past ~130% the coordinates no longer fit side by side, so give each its
+     own row rather than truncating a value the user needs to read. */
+  @container (max-width: 0px) { .loc-row { grid-template-columns: 1fr; } }
+  .big-ui .loc-row { grid-template-columns: 1fr; }
+  .big-ui .loc-row #loc-go { justify-self: start; }
   .loc-row input {
-    font-family: var(--mono); font-size: 11px; color: var(--ink);
+    font-family: var(--mono); font-size: 0.7857em; color: var(--ink);
     background: rgba(255,255,255,.04); border: 1px solid var(--chrome);
     border-radius: 5px; padding: 5px 7px; min-width: 0;
   }
@@ -297,24 +312,24 @@
     outline: none; border-color: var(--mid); background: rgba(127,178,229,.08);
   }
   .loc-err {
-    font-size: 9.5px; color: var(--alert); margin-top: 5px; line-height: 1.5;
+    font-size: 0.6786em; color: var(--alert); margin-top: 5px; line-height: 1.5;
   }
 
   .ctl-l {
-    font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
+    font-size: 0.6071em; color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: .1em; display: flex; justify-content: space-between;
     gap: 14px; align-items: baseline;
   }
   .ctl-v {
-    font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+    font-family: var(--mono); font-size: 0.7857em; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
-  #rot, #radius {
+  #rot, #radius, #uiscale, #chartscale {
     width: 100%; accent-color: var(--mid); margin: 0; display: block;
   }
-  .ctl-row { display: flex; gap: 6px; }
+  .ctl-row { display: flex; gap: 6px; flex-wrap: wrap; }
   .chip {
-    font-family: var(--mono); font-size: 9.5px; color: var(--ink-dim);
+    font-family: var(--mono); font-size: 0.6786em; color: var(--ink-dim);
     background: transparent; border: 1px solid var(--chrome);
     border-radius: 5px; padding: 4px 7px; cursor: pointer;
     letter-spacing: .03em;
@@ -325,7 +340,7 @@
   .ctl-div { height: 1px; background: var(--chrome); margin: 3px 0 2px; }
   .ctl-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
   #detail-empty {
-    font-size: 10.5px; color: var(--ink-faint); line-height: 1.6;
+    font-size: 0.75em; color: var(--ink-faint); line-height: 1.6;
   }
 
   /* ---- projector mode ------------------------------------------------
@@ -335,24 +350,24 @@
      full white with a hard dark outline, and scales type up for viewing
      from across a room. */
   .proj .ac-label {
-    font-size: 15px; font-weight: 700;
+    font-size: calc(15px * var(--chart-scale)); font-weight: 700;
     stroke: #000; stroke-width: 4.5px; paint-order: stroke;
   }
   .proj .ac-sub {
-    font-size: 12.5px; fill: #C9D6EE;
+    font-size: calc(12.5px * var(--chart-scale)); fill: #C9D6EE;
     stroke: #000; stroke-width: 4px; paint-order: stroke;
   }
   .proj .compass {
-    fill: #C8D6F2; font-size: 19px; font-weight: 700;
+    fill: #C8D6F2; font-size: calc(19px * var(--chart-scale)); font-weight: 700;
     paint-order: stroke; stroke: #000; stroke-width: 4px;
   }
-  .proj .compass.cardinal { fill: #FFFFFF; font-size: 23px; }
+  .proj .compass.cardinal { fill: #FFFFFF; font-size: calc(23px * var(--chart-scale)); }
   .proj .ring-label {
-    fill: #9FB0CE; font-size: 13px;
+    fill: #9FB0CE; font-size: calc(13px * var(--chart-scale));
     paint-order: stroke; stroke: #000; stroke-width: 3.5px;
   }
   .proj .center-label {
-    fill: #FFFFFF; font-size: 13px; font-weight: 700;
+    fill: #FFFFFF; font-size: calc(13px * var(--chart-scale)); font-weight: 700;
     paint-order: stroke; stroke: #000; stroke-width: 3.5px;
   }
   .proj .ring { stroke: #4A5F8C; stroke-width: 1.6; }
@@ -460,6 +475,16 @@
         <button type="button" class="chip" id="loc-home">home</button>
         <button type="button" class="chip" id="loc-here">use my location</button>
       </div>
+    </div>
+
+    <div class="ctl-group">
+      <div class="ctl-l"><label for="uiscale">Panel text</label><span class="ctl-v" id="uiscale-v">100%</span></div>
+      <input type="range" id="uiscale" min="80" max="220" step="5" value="100">
+    </div>
+
+    <div class="ctl-group">
+      <div class="ctl-l"><label for="chartscale">Marker text</label><span class="ctl-v" id="chartscale-v">100%</span></div>
+      <input type="range" id="chartscale" min="80" max="300" step="5" value="100">
     </div>
 
     <div class="ctl-group">
@@ -842,6 +867,7 @@
     updateChipCounts(all);
 
     var placed = [];
+    var cs = chartScale / 100;   // label metrics follow the marker-text slider
     // Draw farthest first so the nearest aircraft -- the ones actually overhead --
     // claim uncontested label space and sit on top.
     var byNear = aircraft.slice().sort(function (x, y) {
@@ -919,9 +945,9 @@
       var ly = p.y - 1;
       var guard = 0;
       while (guard++ < 14 && placed.some(function (q) {
-        return Math.abs(q.x - lx) < (projector ? 112 : 78) &&
-               Math.abs(q.y - ly) < (projector ? 19 : 13);
-      })) { ly += projector ? 19 : 13; }
+        return Math.abs(q.x - lx) < (projector ? 112 : 78) * cs &&
+               Math.abs(q.y - ly) < (projector ? 19 : 13) * cs;
+      })) { ly += (projector ? 19 : 13) * cs; }
       placed.push({ x: lx, y: ly });
 
       // If the label drifted off its dot, tether it with a hairline.
@@ -937,7 +963,7 @@
       lbl.textContent = a.flight || a.reg || a.hex;
       g.appendChild(lbl);
 
-      var sub = el("text", { x: lx, y: ly + (projector ? 14 : 9.5), "class": "ac-sub", "text-anchor": anchor });
+      var sub = el("text", { x: lx, y: ly + (projector ? 14 : 9.5) * cs, "class": "ac-sub", "text-anchor": anchor });
       sub.textContent = fmtAlt(a.alt) + (a.type ? " · " + a.type : "");
       g.appendChild(sub);
 
@@ -1311,6 +1337,54 @@
     redraw();
   });
 
+  /* Two type scales, persisted per browser. Ctrl +/- drives the panel scale,
+     matching the browser-zoom gesture people already reach for. */
+  var uiScale = 100, chartScale = 100;
+  try {
+    uiScale = parseInt(localStorage.getItem("skyview.uiScale") || "100", 10) || 100;
+    chartScale = parseInt(localStorage.getItem("skyview.chartScale") || "100", 10) || 100;
+  } catch (err) { /* blocked storage */ }
+
+  var uiEl = document.getElementById("uiscale");
+  var uiV = document.getElementById("uiscale-v");
+  var chartEl = document.getElementById("chartscale");
+  var chartV = document.getElementById("chartscale-v");
+
+  function applyScales(redrawChart) {
+    uiScale = Math.max(80, Math.min(220, uiScale));
+    chartScale = Math.max(80, Math.min(300, chartScale));
+    document.documentElement.style.setProperty("--ui-scale", uiScale / 100);
+    document.documentElement.style.setProperty("--chart-scale", chartScale / 100);
+    document.body.classList.toggle("big-ui", uiScale >= 130);
+    uiEl.value = uiScale; uiV.textContent = uiScale + "%";
+    chartEl.value = chartScale; chartV.textContent = chartScale + "%";
+    try {
+      localStorage.setItem("skyview.uiScale", String(uiScale));
+      localStorage.setItem("skyview.chartScale", String(chartScale));
+    } catch (err) { /* ignore */ }
+    if (redrawChart) render(lastAircraft);
+  }
+
+  uiEl.addEventListener("input", function () {
+    uiScale = Number(uiEl.value); applyScales(false);
+  });
+  chartEl.addEventListener("input", function () {
+    chartScale = Number(chartEl.value); applyScales(true);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (e.key === "=" || e.key === "+") {
+      e.preventDefault(); uiScale += 10; applyScales(false);
+    } else if (e.key === "-" || e.key === "_") {
+      e.preventDefault(); uiScale -= 10; applyScales(false);
+    } else if (e.key === "0") {
+      e.preventDefault(); uiScale = 100; chartScale = 100; applyScales(true);
+    }
+  });
+
   var projTog = document.getElementById("projtog");
   var projector = false;
   try {
@@ -1402,10 +1476,12 @@
     document.querySelector("#n-near").nextElementSibling.textContent = "Within 5 nm";
     if (!showGrid) { showGrid = true; gridTog.classList.add("on"); gridTog.setAttribute("aria-pressed","true"); }
     showMap = false; syncMapChip();
+    uiScale = 100; chartScale = 100; applyScales(false);
     if (!mirrored) mirrorEl.click(); else redraw();
   });
 
   buildChips();
+  applyScales(false);
   applyProjector();
   syncMapChip();
   drawGrid();
