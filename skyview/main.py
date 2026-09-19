@@ -25,6 +25,9 @@ from . import airports as apt
 # Fairborn, Ohio
 FAIRBORN_LAT = 39.8209
 FAIRBORN_LON = -84.0194
+# Fetch wide once; the UI filters to the radius the viewer selects. This keeps
+# radius changes instant and costs no extra upstream calls.
+FETCH_RADIUS_NM = 120
 DEFAULT_RADIUS_NM = 60
 
 UPSTREAMS = [
@@ -82,7 +85,7 @@ async def _fetch_upstream(client: httpx.AsyncClient) -> tuple[str, list[dict]]:
 
     errors = []
     for name, template, key in UPSTREAMS:
-        url = template.format(lat=FAIRBORN_LAT, lon=FAIRBORN_LON, dist=DEFAULT_RADIUS_NM)
+        url = template.format(lat=FAIRBORN_LAT, lon=FAIRBORN_LON, dist=FETCH_RADIUS_NM)
         try:
             response = await client.get(url, timeout=8.0)
             response.raise_for_status()
@@ -171,6 +174,7 @@ async def flights():
         "source": source,
         "center": {"lat": FAIRBORN_LAT, "lon": FAIRBORN_LON, "name": "Fairborn, OH"},
         "radius_nm": DEFAULT_RADIUS_NM,
+        "fetch_radius_nm": FETCH_RADIUS_NM,
         "aircraft": _clean(rows),
     }
     _cache["at"] = now

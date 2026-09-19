@@ -9,11 +9,14 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
 <style>
   :root {
-    --ground: #0B1020;
-    --field: #121A30;
-    --field-2: #0E1526;
-    --ring: #2A3A5C;
-    --ring-faint: #1C2743;
+    --ground: #000000;
+    --field: #05070D;
+    --field-2: #05070C;
+    /* Axes deliberately dim: at full brightness in a dark room the grid glares
+       and washes out the traffic, which is the thing worth seeing. */
+    --ring: #17203A;
+    --ring-faint: #0E1526;
+    --chrome: #141C30;
     --ink: #E8EEF9;
     --ink-dim: #8FA0C0;
     --ink-faint: #5A6B8C;
@@ -34,11 +37,7 @@
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
   }
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    height: 100%;
-  }
+  #app { height: 100%; }
 
   /* ---- sky dome ---- */
   #sky-wrap {
@@ -48,7 +47,7 @@
     place-items: center;
     padding: 16px;
     background:
-      radial-gradient(ellipse at 50% 45%, var(--field) 0%, var(--field-2) 55%, var(--ground) 100%);
+      radial-gradient(ellipse at 50% 45%, var(--field) 0%, var(--ground) 70%);
   }
   #sky { width: min(100%, 100vh); height: auto; max-height: 100%; display: block; }
 
@@ -60,10 +59,10 @@
   }
   .spoke { stroke: var(--ring-faint); stroke-width: 1; }
   .compass {
-    fill: var(--ink-dim); font-family: var(--ui); font-size: 13px;
+    fill: #56678A; font-family: var(--ui); font-size: 13px;
     font-weight: 600; letter-spacing: .12em; text-anchor: middle;
   }
-  .compass.cardinal { fill: var(--ink); font-size: 15px; }
+  .compass.cardinal { fill: #8195BC; font-size: 15px; }
 
   .center-dot { fill: var(--ink); }
   .center-ring { fill: none; stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 3; }
@@ -90,14 +89,46 @@
 
   /* ---- rail ---- */
   #rail {
-    border-left: 1px solid var(--ring-faint);
-    background: var(--field-2);
+    position: fixed; z-index: 50;
+    top: 0; bottom: 0; right: 0; width: 320px;
+    background: #04060B;
+    border-left: 1px solid var(--chrome);
     display: flex; flex-direction: column;
     min-height: 0;
+    transform: translateX(100%);
+    transition: transform .22s ease;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #rail.open { transform: translateX(0); }
+  .rail-titlebar {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  }
+  #rail-close {
+    background: none; border: 0; color: var(--ink-faint);
+    font-size: 21px; line-height: 1; cursor: pointer; padding: 0 2px;
+  }
+  #rail-close:hover { color: var(--ink); }
+  #rail-close:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
+
+  #rail-open {
+    position: absolute; right: 22px; top: 22px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--ui); font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; color: var(--ink-dim);
+    background: rgba(8,11,20,.82); backdrop-filter: blur(6px);
+    border: 1px solid var(--chrome); border-radius: 7px;
+    padding: 8px 12px; cursor: pointer;
+  }
+  #rail-open:hover { color: var(--ink); border-color: var(--ring); }
+  #rail-open:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
+  .rail-count {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--high); font-variant-numeric: tabular-nums;
   }
   .rail-head {
     padding: 18px 18px 14px;
-    border-bottom: 1px solid var(--ring-faint);
+    border-bottom: 1px solid var(--chrome);
   }
   h1 {
     margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
@@ -138,9 +169,9 @@
     color: var(--ink-dim); font-variant-numeric: tabular-nums; line-height: 1.5;
   }
   #detail {
-    border-top: 1px solid var(--ring-faint);
-    background: rgba(127,178,229,.06);
-    padding: 13px 18px 15px;
+    background: rgba(127,178,229,.05);
+    border: 1px solid var(--chrome); border-radius: 7px;
+    padding: 12px 13px 13px;
   }
   .d-call {
     font-family: var(--mono); font-size: 14px; font-weight: 700;
@@ -165,7 +196,7 @@
     font-size: 10px; color: var(--ink-faint); line-height: 1.55;
   }
   .rail-foot {
-    padding: 11px 18px; border-top: 1px solid var(--ring-faint);
+    padding: 11px 18px; border-top: 1px solid var(--chrome);
     font-size: 10px; color: var(--ink-faint);
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -178,13 +209,65 @@
   @keyframes blip { 0%,100% { opacity: .35 } 4% { opacity: 1 } }
   .pulse.err { background: var(--alert); animation: none; opacity: 1; }
 
-  #controls {
+  /* ---- drawer ---- */
+  #drawer-open {
     position: absolute; left: 22px; top: 22px;
-    display: flex; flex-direction: column; gap: 9px;
-    background: rgba(11,16,32,.72); backdrop-filter: blur(6px);
-    border: 1px solid var(--ring-faint); border-radius: 8px;
-    padding: 12px 14px 13px;
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--ui); font-size: 11px; font-weight: 500;
+    letter-spacing: .04em; color: var(--ink-dim);
+    background: rgba(8,11,20,.82); backdrop-filter: blur(6px);
+    border: 1px solid var(--chrome); border-radius: 7px;
+    padding: 8px 12px; cursor: pointer;
   }
+  #drawer-open:hover { color: var(--ink); border-color: var(--ring); }
+  #drawer-open:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
+  .bars {
+    width: 12px; height: 9px; position: relative; display: inline-block;
+  }
+  .bars::before, .bars::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 1.5px;
+    background: currentColor;
+  }
+  .bars::before { top: 0; box-shadow: 0 3.75px 0 currentColor; }
+  .bars::after { bottom: 0; }
+
+  #scrim {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    z-index: 40; border: 0;
+  }
+
+  #drawer {
+    position: fixed; z-index: 50;
+    top: 0; bottom: 0; left: 0; width: 290px;
+    background: #04060B;
+    border-right: 1px solid var(--chrome);
+    display: flex; flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform .22s ease;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #drawer.open { transform: translateX(0); }
+  .drawer-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px 13px; border-bottom: 1px solid var(--chrome);
+  }
+  .drawer-title {
+    font-size: 12px; font-weight: 600; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--ink-dim);
+  }
+  #drawer-close {
+    background: none; border: 0; color: var(--ink-faint);
+    font-size: 21px; line-height: 1; cursor: pointer; padding: 0 2px;
+  }
+  #drawer-close:hover { color: var(--ink); }
+  #drawer-close:focus-visible { outline: 2px solid var(--mid); outline-offset: 2px; }
+  .drawer-body {
+    padding: 16px 18px 22px; overflow-y: auto; flex: 1; min-height: 0;
+    display: flex; flex-direction: column; gap: 11px;
+  }
+  .ctl-group { display: flex; flex-direction: column; gap: 7px; }
+
   .ctl-l {
     font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
     letter-spacing: .1em; display: flex; justify-content: space-between;
@@ -194,32 +277,24 @@
     font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
-  #rot {
-    width: 172px; accent-color: var(--mid); margin: 0; display: block;
+  #rot, #radius {
+    width: 100%; accent-color: var(--mid); margin: 0; display: block;
   }
   .ctl-row { display: flex; gap: 6px; }
   .chip {
     font-family: var(--mono); font-size: 9.5px; color: var(--ink-dim);
-    background: transparent; border: 1px solid var(--ring-faint);
+    background: transparent; border: 1px solid var(--chrome);
     border-radius: 5px; padding: 4px 7px; cursor: pointer;
     letter-spacing: .03em;
   }
   .chip:hover { border-color: var(--ring); color: var(--ink); }
-  .chip.on { background: rgba(127,178,229,.18); border-color: var(--mid); color: var(--high); }
+  .chip.on { background: rgba(127,178,229,.16); border-color: var(--mid); color: var(--high); }
   .chip:focus-visible { outline: 2px solid var(--mid); outline-offset: 1px; }
-
-  .ctl-div { height: 1px; background: var(--ring-faint); margin: 2px 0 1px; }
-  .ctl-wrap { display: flex; flex-wrap: wrap; gap: 5px; max-width: 186px; }
-  .appr {
-    display: inline-block; font-family: var(--mono); font-size: 8.5px;
-    font-weight: 700; letter-spacing: .04em; color: var(--ground);
-    background: var(--low); border-radius: 3px; padding: 1px 4px;
-    margin-left: 6px; vertical-align: 1px;
+  .ctl-div { height: 1px; background: var(--chrome); margin: 3px 0 2px; }
+  .ctl-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+  #detail-empty {
+    font-size: 10.5px; color: var(--ink-faint); line-height: 1.6;
   }
-  .cnum {
-    font-size: 8.5px; color: var(--ink-faint); margin-left: 3px;
-  }
-  .chip.off-state { opacity: .45; }
 
   .legend {
     position: absolute; left: 22px; bottom: 18px;
@@ -256,45 +331,76 @@
       <g id="grid"></g>
       <g id="planes"></g>
     </svg>
-    <div id="controls">
-      <div>
-        <div class="ctl-l"><label for="rot">Rotate</label><span class="ctl-v" id="rot-v">N up</span></div>
-        <input type="range" id="rot" min="0" max="355" step="5" value="0">
-      </div>
-      <div class="ctl-row">
-        <button type="button" class="chip on" id="mirror" aria-pressed="true">mirrored</button>
-        <button type="button" class="chip" id="reset">reset</button>
-      </div>
-      <div class="ctl-div"></div>
-      <div class="ctl-l"><span>Operator</span><span class="ctl-v" style="font-size:8px">click = only · shift = add</span></div>
-      <div class="ctl-wrap" id="f-op"></div>
-      <div class="ctl-l"><span>Phase</span></div>
-      <div class="ctl-wrap" id="f-phase"></div>
-    </div>
+    <button type="button" id="drawer-open" aria-label="Open controls" aria-expanded="false">
+      <span class="bars"></span> Controls
+    </button>
     <div class="legend" id="legend"></div>
     <div class="mirror-note">
       mirrored view — you are<br>facing up, head to north.<br>east sits to your left.
     </div>
   </div>
 
-  <aside id="rail">
-    <div class="rail-head">
-      <h1>Sky View over Fairborn</h1>
-      <p class="sub">39.82°N 84.02°W · 60 nm</p>
-      <div class="stats">
-        <div><div class="stat-n" id="n-total">—</div><div class="stat-l">Overhead</div></div>
-        <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 15 nm</div></div>
-        <div><div class="stat-n" id="n-low">—</div><div class="stat-l">Below 10k</div></div>
-      </div>
-    </div>
-    <div id="list"></div>
-    <div id="detail" hidden></div>
-    <div class="rail-foot">
-      <span><span class="pulse live" id="pulse"></span><span id="status">connecting…</span></span>
-      <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a>
-    </div>
-  </aside>
+  <button type="button" id="rail-open" aria-label="Open traffic list" aria-expanded="false">
+    Traffic <span class="rail-count" id="rail-count">—</span>
+  </button>
 </div>
+
+<aside id="rail" aria-label="Traffic over Fairborn" aria-hidden="true">
+  <div class="rail-head">
+    <div class="rail-titlebar">
+      <h1>Sky View over Fairborn</h1>
+      <button type="button" id="rail-close" aria-label="Close traffic list">&times;</button>
+    </div>
+    <p class="sub" id="sub-coords">39.82°N 84.02°W · 60 nm</p>
+    <div class="stats">
+      <div><div class="stat-n" id="n-total">—</div><div class="stat-l">Overhead</div></div>
+      <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 15 nm</div></div>
+      <div><div class="stat-n" id="n-low">—</div><div class="stat-l">Below 10k</div></div>
+    </div>
+  </div>
+  <div id="list"></div>
+  <div class="rail-foot">
+    <span><span class="pulse live" id="pulse"></span><span id="status">connecting…</span></span>
+    <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a>
+  </div>
+</aside>
+
+<div id="scrim" hidden></div>
+<aside id="drawer" aria-label="Chart controls and aircraft detail" aria-hidden="true">
+  <div class="drawer-head">
+    <span class="drawer-title">Controls</span>
+    <button type="button" id="drawer-close" aria-label="Close controls">&times;</button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="ctl-group">
+      <div class="ctl-l"><label for="radius">Radius</label><span class="ctl-v" id="radius-v">60 nm</span></div>
+      <input type="range" id="radius" min="10" max="120" step="5" value="60">
+    </div>
+
+    <div class="ctl-group">
+      <div class="ctl-l"><label for="rot">Rotate</label><span class="ctl-v" id="rot-v">N up</span></div>
+      <input type="range" id="rot" min="0" max="355" step="5" value="0">
+    </div>
+
+    <div class="ctl-row">
+      <button type="button" class="chip on" id="mirror" aria-pressed="true">mirrored</button>
+      <button type="button" class="chip on" id="gridtog" aria-pressed="true">grid</button>
+      <button type="button" class="chip" id="reset">reset</button>
+    </div>
+
+    <div class="ctl-div"></div>
+
+    <div class="ctl-l"><span>Operator</span><span class="ctl-v" style="font-size:8px">click = only · shift = add</span></div>
+    <div class="ctl-wrap" id="f-op"></div>
+    <div class="ctl-l"><span>Phase</span></div>
+    <div class="ctl-wrap" id="f-phase"></div>
+
+    <div class="ctl-div"></div>
+    <div id="detail" hidden></div>
+    <div id="detail-empty">Select an aircraft to see its details and flown track.</div>
+  </div>
+</aside>
 
 <script>
 (function () {
@@ -302,7 +408,8 @@
 
   var SVG = "http://www.w3.org/2000/svg";
   var CX = 280, CY = 280, R = 246;
-  var MAX_NM = 60;
+  var MAX_NM = 60;        // view radius, driven by the Radius slider
+  var showGrid = true;
   var POLL_MS = 5000;
 
   var grid = document.getElementById("grid");
@@ -426,8 +533,29 @@
     return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
   }
 
+  function ringSteps() {
+    // Pick a round ring interval that yields roughly four rings at any radius.
+    var raw = MAX_NM / 4;
+    var nice = [5, 10, 15, 20, 25, 30, 50];
+    var step = nice[nice.length - 1];
+    for (var i = 0; i < nice.length; i++) {
+      if (raw <= nice[i]) { step = nice[i]; break; }
+    }
+    var out = [];
+    for (var r = step; r <= MAX_NM + 0.001; r += step) out.push(Math.round(r));
+    if (out[out.length - 1] !== MAX_NM) out.push(MAX_NM);
+    return out;
+  }
+
   function drawGrid() {
-    var rings = [15, 30, 45, 60];
+    if (!showGrid) {
+      // Keep the outer edge and compass so the chart stays readable.
+      grid.appendChild(el("circle", { cx: CX, cy: CY, r: R, "class": "ring" }));
+      drawCompass();
+      drawCentre();
+      return;
+    }
+    var rings = ringSteps();
     rings.forEach(function (nm) {
       var r = (nm / MAX_NM) * R;
       grid.appendChild(el("circle", {
@@ -444,6 +572,11 @@
       grid.appendChild(el("line", { x1: CX, y1: CY, x2: p.x, y2: p.y, "class": "spoke" }));
     }
 
+    drawCompass();
+    drawCentre();
+  }
+
+  function drawCompass() {
     var marks = [
       { b: 0, l: "N", c: true }, { b: 45, l: "NE" }, { b: 90, l: "E", c: true },
       { b: 135, l: "SE" }, { b: 180, l: "S", c: true }, { b: 225, l: "SW" },
@@ -458,7 +591,9 @@
       t.textContent = m.l;
       grid.appendChild(t);
     });
+  }
 
+  function drawCentre() {
     grid.appendChild(el("circle", { cx: CX, cy: CY, r: 13, "class": "center-ring" }));
     grid.appendChild(el("circle", { cx: CX, cy: CY, r: 2.5, "class": "center-dot" }));
     var c = el("text", { x: CX, y: CY + 27, "class": "center-label" });
@@ -490,7 +625,9 @@
     lastAircraft = aircraft;
     planesG.textContent = "";
 
-    var all = aircraft;
+    var all = aircraft.filter(function (a) {
+      return a.dst === null || a.dst === undefined || a.dst <= MAX_NM;
+    });
     aircraft = all.filter(passes);
     updateChipCounts(all);
 
@@ -514,6 +651,7 @@
       g.addEventListener("click", function () {
         selected = (selected === a.hex) ? null : a.hex;
         render(lastAircraft);
+        if (selected) setDrawer(true);
       });
 
       // Flown track for the selected aircraft: where it came from, fading with age.
@@ -595,10 +733,12 @@
     });
 
     // Stats
+    document.getElementById("rail-count").textContent = aircraft.length;
     document.getElementById("n-total").textContent =
       aircraft.length + (aircraft.length !== all.length ? " / " + all.length : "");
+    var nearNm = MAX_NM <= 20 ? 5 : 15;
     document.getElementById("n-near").textContent =
-      aircraft.filter(function (a) { return a.dst !== null && a.dst < 15; }).length;
+      aircraft.filter(function (a) { return a.dst !== null && a.dst < nearNm; }).length;
     document.getElementById("n-low").textContent =
       aircraft.filter(function (a) { return a.alt !== null && a.alt < 10000; }).length;
 
@@ -611,6 +751,7 @@
       row.addEventListener("click", function () {
         selected = (selected === a.hex) ? null : a.hex;
         render(lastAircraft);
+        if (selected) setDrawer(true);
       });
 
       var sw = document.createElement("div");
@@ -732,8 +873,10 @@
       tn.textContent = trackNote;
       detail.appendChild(tn);
       detail.hidden = false;
+      document.getElementById("detail-empty").hidden = true;
     } else {
       detail.hidden = true;
+      document.getElementById("detail-empty").hidden = false;
     }
 
     if (!aircraft.length) {
@@ -835,6 +978,65 @@
     });
   }
 
+  var radiusEl = document.getElementById("radius");
+  var radiusV = document.getElementById("radius-v");
+  var gridTog = document.getElementById("gridtog");
+  var drawer = document.getElementById("drawer");
+  var scrim = document.getElementById("scrim");
+  var openBtn = document.getElementById("drawer-open");
+
+  function setDrawer(open) {
+    drawer.classList.toggle("open", open);
+    drawer.setAttribute("aria-hidden", String(!open));
+    scrim.hidden = !(open || rail.classList.contains("open"));
+    openBtn.setAttribute("aria-expanded", String(open));
+    if (open) document.getElementById("drawer-close").focus();
+    else openBtn.focus();
+  }
+
+  var rail = document.getElementById("rail");
+  var railOpen = document.getElementById("rail-open");
+
+  function setRail(open) {
+    rail.classList.toggle("open", open);
+    rail.setAttribute("aria-hidden", String(!open));
+    railOpen.setAttribute("aria-expanded", String(open));
+    scrim.hidden = !(open || drawer.classList.contains("open"));
+    if (open) document.getElementById("rail-close").focus();
+  }
+
+  railOpen.addEventListener("click", function () { setRail(true); });
+  document.getElementById("rail-close").addEventListener("click", function () {
+    setRail(false); railOpen.focus();
+  });
+
+  openBtn.addEventListener("click", function () { setDrawer(true); });
+  document.getElementById("drawer-close").addEventListener("click", function () { setDrawer(false); });
+  scrim.addEventListener("click", function () { setDrawer(false); setRail(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (drawer.classList.contains("open")) setDrawer(false);
+    else if (rail.classList.contains("open")) setRail(false);
+  });
+
+  radiusEl.addEventListener("input", function () {
+    MAX_NM = Number(radiusEl.value);
+    radiusV.textContent = MAX_NM + " nm";
+    document.getElementById("sub-coords").textContent =
+      "39.82°N 84.02°W · " + MAX_NM + " nm";
+    // "Within 15 nm" stops meaning much once the view is tighter than that.
+    document.querySelector("#n-near").nextElementSibling.textContent =
+      MAX_NM <= 20 ? "Within 5 nm" : "Within 15 nm";
+    redraw();
+  });
+
+  gridTog.addEventListener("click", function () {
+    showGrid = !showGrid;
+    gridTog.classList.toggle("on", showGrid);
+    gridTog.setAttribute("aria-pressed", String(showGrid));
+    redraw();
+  });
+
   var rotEl = document.getElementById("rot");
   var rotV = document.getElementById("rot-v");
   var mirrorEl = document.getElementById("mirror");
@@ -865,6 +1067,10 @@
 
   document.getElementById("reset").addEventListener("click", function () {
     rotation = 0; rotEl.value = 0; rotV.textContent = rotLabel();
+    MAX_NM = 60; radiusEl.value = 60; radiusV.textContent = "60 nm";
+    document.getElementById("sub-coords").textContent = "39.82°N 84.02°W · 60 nm";
+    document.querySelector("#n-near").nextElementSibling.textContent = "Within 15 nm";
+    if (!showGrid) { showGrid = true; gridTog.classList.add("on"); gridTog.setAttribute("aria-pressed","true"); }
     if (!mirrored) mirrorEl.click(); else redraw();
   });
 
