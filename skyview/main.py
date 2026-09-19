@@ -18,7 +18,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 
 from . import airports as apt
 
@@ -28,7 +28,7 @@ FAIRBORN_LON = -84.0399195
 # Fetch wide once; the UI filters to the radius the viewer selects. This keeps
 # radius changes instant and costs no extra upstream calls.
 FETCH_RADIUS_NM = 120
-DEFAULT_RADIUS_NM = 60
+DEFAULT_RADIUS_NM = 20
 
 UPSTREAMS = [
     ("adsb.fi", "https://opendata.adsb.fi/api/v2/lat/{lat}/lon/{lon}/dist/{dist}", "aircraft"),
@@ -40,6 +40,14 @@ UPSTREAMS = [
 READSB_URL = os.environ.get("READSB_URL")
 
 STATIC_DIR = Path(__file__).parent / "static"
+
+# Street map tiles are proxied rather than fetched by the browser. OSM's tile
+# policy requires an identifying User-Agent and sensible caching, and blocks
+# clients that do not comply -- which a browser making anonymous cross-origin
+# requests does not. Tiles are cached on disk and served from there.
+TILE_CACHE_DIR = Path(__file__).parent / "data" / "tiles"
+TILE_UA = "skyview-fairborn/1.0 (https://github.com/rfraleigh/skyview)"
+TILE_MAX_ZOOM = 14
 
 app = FastAPI(title="Sky View over Fairborn")
 
@@ -205,6 +213,42 @@ async def flights(lat: float | None = None, lon: float | None = None):
     _cache["key"] = key
     _cache["payload"] = payload
     return JSONResponse(payload)
+
+
+@app.get("/tiles/{z}/{x}/{y}.png")
+async def tile(z: int, x: int, y: int):
+    """Proxy and cache OSM tiles, so the browser never hits OSM directly."""
+    if not (0 <= z <= TILE_MAX_ZOOM):
+        raise HTTPException(status_code=404, detail="zoom out of range")
+    limit = 2 ** z
+    if not (0 <= x < limit and 0 <= y < limit):
+        raise HTTPException(status_code=404, detail="tile out of range")
+
+    path = TILE_CACHE_DIR / str(z) / str(x) / f"{y}.png"
+    if path.exists():
+        return Response(
+            content=path.read_bytes(),
+            media_type="image/png",
+            headers={"Cache-Control": "public, max-age=604800"},
+        )
+
+    url = f"https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    try:
+        async with httpx.AsyncClient(headers={"User-Agent": TILE_UA}) as client:
+            response = await client.get(url, timeout=12.0)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"tile fetch failed: {exc}")
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="tile unavailable")
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(response.content)
+    return Response(
+        content=response.content,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=604800"},
+    )
 
 
 @app.get("/")

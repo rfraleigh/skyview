@@ -57,11 +57,17 @@ grey so they read in an unlit room without competing with the traffic. The
 canvas is sized so its extent matches the outer ring exactly, and it rotates
 with the chart.
 
-Tiles come straight from tile.openstreetmap.org (they send
-`access-control-allow-origin: *`, so no proxy is needed). Respect the
-[OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
--- it is fine for personal use at this volume, but heavy or automated use
-should run its own tile source. Attribution is shown on the map.
+Tiles are proxied through the app at `/tiles/{z}/{x}/{y}.png` and cached to
+disk under `skyview/data/tiles/`, which is gitignored. The browser never talks
+to OSM directly.
+
+That indirection is required, not incidental. OSM's
+[tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+expects an identifying User-Agent and real caching, and their servers block
+clients that do not comply -- an earlier version fetched tiles straight from
+the browser and was blocked within a day, serving "Access blocked" images in
+place of the map. The proxy sends a proper User-Agent, caches every tile, and
+caps zoom at 14.
 
 Carto's basemaps were the first choice for a dark UI, but they now watermark
 unkeyed tiles with "API KEY REQUIRED".

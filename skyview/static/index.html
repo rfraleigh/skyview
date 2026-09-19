@@ -389,10 +389,10 @@
       <h1>Sky View over Fairborn</h1>
       <button type="button" id="rail-close" aria-label="Close traffic list">&times;</button>
     </div>
-    <p class="sub" id="sub-coords">39.78°N 84.04°W · 60 nm</p>
+    <p class="sub" id="sub-coords">39.78°N 84.04°W · 20 nm</p>
     <div class="stats">
       <div><div class="stat-n" id="n-total">—</div><div class="stat-l">Overhead</div></div>
-      <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 15 nm</div></div>
+      <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 5 nm</div></div>
       <div><div class="stat-n" id="n-low">—</div><div class="stat-l">Below 10k</div></div>
     </div>
   </div>
@@ -428,8 +428,8 @@
     </div>
 
     <div class="ctl-group">
-      <div class="ctl-l"><label for="radius">Radius</label><span class="ctl-v" id="radius-v">60 nm</span></div>
-      <input type="range" id="radius" min="10" max="120" step="5" value="60">
+      <div class="ctl-l"><label for="radius">Radius</label><span class="ctl-v" id="radius-v">20 nm</span></div>
+      <input type="range" id="radius" min="10" max="120" step="5" value="20">
     </div>
 
     <div class="ctl-group">
@@ -463,7 +463,7 @@
 
   var SVG = "http://www.w3.org/2000/svg";
   var CX = 280, CY = 280, R = 246;
-  var MAX_NM = 60;        // view radius, driven by the Radius slider
+  var MAX_NM = 20;        // view radius, driven by the Radius slider
   var HOME = { lat: 39.7792142, lon: -84.0399195 };
   var centre = { lat: HOME.lat, lon: HOME.lon };
   var showGrid = true;
@@ -611,7 +611,7 @@
   function pickZoom(spanNm, pixels) {
     // Choose the zoom whose pixel scale best matches the chart's.
     var spanDeg = spanNm / 60 / Math.cos(centre.lat * Math.PI / 180);
-    for (var z = 16; z >= 3; z--) {
+    for (var z = 14; z >= 3; z--) {
       var worldPx = Math.pow(2, z) * TILE;
       if (spanDeg / 360 * worldPx <= pixels * 1.6) return z;
     }
@@ -681,8 +681,6 @@
           ctx.drawImage(img, dx, dy, dsize, dsize);
         } else if (!img) {
           img = new Image();
-          img.crossOrigin = "anonymous";
-          img.referrerPolicy = "no-referrer";
           tileCache[key] = img;
           (function (d1, d2, d3, tk) {
             img.onload = function () {
@@ -700,7 +698,7 @@
               if (rotation) c.restore();
             };
           })(dx, dy, dsize, token);
-          img.src = "https://tile.openstreetmap.org/" + z + "/" + wrapped + "/" + ty + ".png";
+          img.src = "/tiles/" + z + "/" + wrapped + "/" + ty + ".png";
         }
       }
     }
@@ -1339,10 +1337,10 @@
 
   document.getElementById("reset").addEventListener("click", function () {
     rotation = 0; rotEl.value = 0; rotV.textContent = rotLabel();
-    MAX_NM = 60; radiusEl.value = 60; radiusV.textContent = "60 nm";
+    MAX_NM = 20; radiusEl.value = 20; radiusV.textContent = "20 nm";
     document.getElementById("sub-coords").textContent =
-      document.getElementById("loc-name").textContent + " · 60 nm";
-    document.querySelector("#n-near").nextElementSibling.textContent = "Within 15 nm";
+      document.getElementById("loc-name").textContent + " · 20 nm";
+    document.querySelector("#n-near").nextElementSibling.textContent = "Within 5 nm";
     if (!showGrid) { showGrid = true; gridTog.classList.add("on"); gridTog.setAttribute("aria-pressed","true"); }
     showMap = false; syncMapChip();
     if (!mirrored) mirrorEl.click(); else redraw();
