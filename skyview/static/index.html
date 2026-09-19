@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sky View over Fairborn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root {
+    --ground: #0B1020;
+    --field: #121A30;
+    --field-2: #0E1526;
+    --ring: #2A3A5C;
+    --ring-faint: #1C2743;
+    --ink: #E8EEF9;
+    --ink-dim: #8FA0C0;
+    --ink-faint: #5A6B8C;
+    --low: #F2A65A;
+    --mid: #7FB2E5;
+    --high: #CFE8FF;
+    --alert: #E5484D;
+    --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --ui: "Inter Tight", system-ui, -apple-system, Segoe UI, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--ui);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    height: 100%;
+  }
+
+  /* ---- sky dome ---- */
+  #sky-wrap {
+    position: relative;
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background:
+      radial-gradient(ellipse at 50% 45%, var(--field) 0%, var(--field-2) 55%, var(--ground) 100%);
+  }
+  #sky { width: min(100%, 100vh); height: auto; max-height: 100%; display: block; }
+
+  .ring { fill: none; stroke: var(--ring-faint); stroke-width: 1; }
+  .ring.major { stroke: var(--ring); }
+  .ring-label {
+    fill: var(--ink-faint); font-family: var(--mono); font-size: 9px;
+    letter-spacing: .04em;
+  }
+  .spoke { stroke: var(--ring-faint); stroke-width: 1; }
+  .compass {
+    fill: var(--ink-dim); font-family: var(--ui); font-size: 13px;
+    font-weight: 600; letter-spacing: .12em; text-anchor: middle;
+  }
+  .compass.cardinal { fill: var(--ink); font-size: 15px; }
+
+  .center-dot { fill: var(--ink); }
+  .center-ring { fill: none; stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 3; }
+  .center-label {
+    fill: var(--ink-dim); font-family: var(--mono); font-size: 9px;
+    text-anchor: middle; letter-spacing: .08em;
+  }
+
+  .ac { cursor: pointer; }
+  .ac-body { stroke-width: 1.25; }
+  .ac-lead { stroke-width: 1.5; stroke-linecap: round; opacity: .75; }
+  .ac-label {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    letter-spacing: .02em; paint-order: stroke;
+    stroke: var(--ground); stroke-width: 3px; stroke-linejoin: round;
+  }
+  .ac-sub {
+    font-family: var(--mono); font-size: 8.5px; fill: var(--ink-faint);
+    paint-order: stroke; stroke: var(--ground); stroke-width: 3px;
+  }
+  .ac.sel .ac-label { fill: #fff; }
+  .ac.sel .ac-halo { fill: none; stroke: var(--ink); stroke-width: 1; opacity: .9; }
+  .ac.alert .ac-body { stroke: var(--alert); fill: var(--alert); }
+
+  /* ---- rail ---- */
+  #rail {
+    border-left: 1px solid var(--ring-faint);
+    background: var(--field-2);
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+  .rail-head {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--ring-faint);
+  }
+  h1 {
+    margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+  }
+  .sub {
+    margin: 4px 0 0; font-family: var(--mono); font-size: 10px;
+    color: var(--ink-faint); letter-spacing: .04em; text-transform: uppercase;
+  }
+  .stats { display: flex; gap: 18px; margin-top: 14px; }
+  .stat-n {
+    font-family: var(--mono); font-size: 22px; font-weight: 700;
+    line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .stat-l {
+    font-size: 9px; color: var(--ink-faint); text-transform: uppercase;
+    letter-spacing: .1em; margin-top: 5px;
+  }
+  #list { overflow-y: auto; flex: 1; min-height: 0; }
+  .row {
+    display: grid; grid-template-columns: 8px 1fr auto;
+    gap: 10px; align-items: center;
+    padding: 9px 18px; cursor: pointer;
+    border-bottom: 1px solid rgba(42,58,92,.35);
+  }
+  .row:hover { background: rgba(127,178,229,.07); }
+  .row.sel { background: rgba(127,178,229,.13); }
+  .swatch { width: 8px; height: 8px; border-radius: 50%; }
+  .call {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .meta {
+    font-size: 10px; color: var(--ink-faint); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .nums {
+    text-align: right; font-family: var(--mono); font-size: 10px;
+    color: var(--ink-dim); font-variant-numeric: tabular-nums; line-height: 1.5;
+  }
+  #detail {
+    border-top: 1px solid var(--ring-faint);
+    background: rgba(127,178,229,.06);
+    padding: 13px 18px 15px;
+  }
+  .d-call {
+    font-family: var(--mono); font-size: 14px; font-weight: 700;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .d-desc { font-size: 11px; color: var(--ink-dim); margin-top: 3px; }
+  .d-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 9px 8px; margin-top: 11px;
+  }
+  .d-k {
+    font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
+    letter-spacing: .09em;
+  }
+  .d-v {
+    font-family: var(--mono); font-size: 12px; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .d-track {
+    margin-top: 11px; padding-top: 10px;
+    border-top: 1px solid rgba(42,58,92,.5);
+    font-size: 10px; color: var(--ink-faint); line-height: 1.55;
+  }
+  .rail-foot {
+    padding: 11px 18px; border-top: 1px solid var(--ring-faint);
+    font-size: 10px; color: var(--ink-faint);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .rail-foot a { color: var(--ink-dim); }
+  .pulse {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mid); margin-right: 6px; vertical-align: middle;
+  }
+  .pulse.live { animation: blip 5s ease-out infinite; }
+  @keyframes blip { 0%,100% { opacity: .35 } 4% { opacity: 1 } }
+  .pulse.err { background: var(--alert); animation: none; opacity: 1; }
+
+  #controls {
+    position: absolute; left: 22px; top: 22px;
+    display: flex; flex-direction: column; gap: 9px;
+    background: rgba(11,16,32,.72); backdrop-filter: blur(6px);
+    border: 1px solid var(--ring-faint); border-radius: 8px;
+    padding: 12px 14px 13px;
+  }
+  .ctl-l {
+    font-size: 8.5px; color: var(--ink-faint); text-transform: uppercase;
+    letter-spacing: .1em; display: flex; justify-content: space-between;
+    gap: 14px; align-items: baseline;
+  }
+  .ctl-v {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-dim);
+    font-variant-numeric: tabular-nums; letter-spacing: 0;
+  }
+  #rot {
+    width: 172px; accent-color: var(--mid); margin: 0; display: block;
+  }
+  .ctl-row { display: flex; gap: 6px; }
+  .chip {
+    font-family: var(--mono); font-size: 9.5px; color: var(--ink-dim);
+    background: transparent; border: 1px solid var(--ring-faint);
+    border-radius: 5px; padding: 4px 7px; cursor: pointer;
+    letter-spacing: .03em;
+  }
+  .chip:hover { border-color: var(--ring); color: var(--ink); }
+  .chip.on { background: rgba(127,178,229,.18); border-color: var(--mid); color: var(--high); }
+  .chip:focus-visible { outline: 2px solid var(--mid); outline-offset: 1px; }
+
+  .ctl-div { height: 1px; background: var(--ring-faint); margin: 2px 0 1px; }
+  .ctl-wrap { display: flex; flex-wrap: wrap; gap: 5px; max-width: 186px; }
+  .appr {
+    display: inline-block; font-family: var(--mono); font-size: 8.5px;
+    font-weight: 700; letter-spacing: .04em; color: var(--ground);
+    background: var(--low); border-radius: 3px; padding: 1px 4px;
+    margin-left: 6px; vertical-align: 1px;
+  }
+  .cnum {
+    font-size: 8.5px; color: var(--ink-faint); margin-left: 3px;
+  }
+  .chip.off-state { opacity: .45; }
+
+  .legend {
+    position: absolute; left: 22px; bottom: 18px;
+    font-size: 9.5px; color: var(--ink-faint);
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .legend-row { display: flex; align-items: center; gap: 7px; }
+  .legend-sw { width: 16px; height: 3px; border-radius: 2px; }
+  .mirror-note {
+    position: absolute; right: 22px; bottom: 18px;
+    font-family: var(--mono); font-size: 9px; color: var(--ink-faint);
+    text-align: right; line-height: 1.6; max-width: 190px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse.live { animation: none; opacity: 1; }
+    .ac { transition: none !important; }
+  }
+  @media (max-width: 860px) {
+    body { overflow: auto; }
+    #app { grid-template-columns: 1fr; height: auto; }
+    #rail { border-left: 0; border-top: 1px solid var(--ring-faint); }
+    #list { max-height: 44vh; }
+    #sky-wrap { padding: 12px 16px 46px; }
+    .legend, .mirror-note { position: static; margin-top: 12px; max-width: none; text-align: left; }
+    .mirror-note { margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="sky-wrap">
+    <svg id="sky" viewBox="0 0 560 560" role="img" aria-label="Overhead sky chart of aircraft near Fairborn, Ohio">
+      <g id="grid"></g>
+      <g id="planes"></g>
+    </svg>
+    <div id="controls">
+      <div>
+        <div class="ctl-l"><label for="rot">Rotate</label><span class="ctl-v" id="rot-v">N up</span></div>
+        <input type="range" id="rot" min="0" max="355" step="5" value="0">
+      </div>
+      <div class="ctl-row">
+        <button type="button" class="chip on" id="mirror" aria-pressed="true">mirrored</button>
+        <button type="button" class="chip" id="reset">reset</button>
+      </div>
+      <div class="ctl-div"></div>
+      <div class="ctl-l"><span>Operator</span><span class="ctl-v" style="font-size:8px">click = only · shift = add</span></div>
+      <div class="ctl-wrap" id="f-op"></div>
+      <div class="ctl-l"><span>Phase</span></div>
+      <div class="ctl-wrap" id="f-phase"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="mirror-note">
+      mirrored view — you are<br>facing up, head to north.<br>east sits to your left.
+    </div>
+  </div>
+
+  <aside id="rail">
+    <div class="rail-head">
+      <h1>Sky View over Fairborn</h1>
+      <p class="sub">39.82°N 84.02°W · 60 nm</p>
+      <div class="stats">
+        <div><div class="stat-n" id="n-total">—</div><div class="stat-l">Overhead</div></div>
+        <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 15 nm</div></div>
+        <div><div class="stat-n" id="n-low">—</div><div class="stat-l">Below 10k</div></div>
+      </div>
+    </div>
+    <div id="list"></div>
+    <div id="detail" hidden></div>
+    <div class="rail-foot">
+      <span><span class="pulse live" id="pulse"></span><span id="status">connecting…</span></span>
+      <a href="https://adsb.fi" target="_blank" rel="noopener">adsb.fi</a>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SVG = "http://www.w3.org/2000/svg";
+  var CX = 280, CY = 280, R = 246;
+  var MAX_NM = 60;
+  var POLL_MS = 5000;
+
+  var grid = document.getElementById("grid");
+  var planesG = document.getElementById("planes");
+  var listEl = document.getElementById("list");
+  var statusEl = document.getElementById("status");
+  var pulseEl = document.getElementById("pulse");
+  var selected = null;
+  var lastAircraft = [];
+
+  // Altitude bands -- the visual key to "how high is that thing".
+  var BANDS = [
+    { max: 4000,   color: "#F2A65A", label: "below 4,000 ft" },
+    { max: 10000,  color: "#E2B07A", label: "4–10,000 ft" },
+    { max: 20000,  color: "#A8BFD8", label: "10–20,000 ft" },
+    { max: 30000,  color: "#7FB2E5", label: "20–30,000 ft" },
+    { max: Infinity, color: "#CFE8FF", label: "above 30,000 ft" }
+  ];
+  function bandFor(alt) {
+    if (alt === null || alt === undefined) return BANDS[2];
+    for (var i = 0; i < BANDS.length; i++) if (alt < BANDS[i].max) return BANDS[i];
+    return BANDS[BANDS.length - 1];
+  }
+
+  /* Silhouettes, drawn nose-up in a 20x20 box centred on 0,0 and rotated to
+     heading. Five shapes cover what actually flies over Fairborn: airliners,
+     bizjets, twin turboprops, light singles, and helicopters. */
+  var SHAPES = {
+    airliner: "M0,-9 L1.5,-6 L2,0 L9,3.5 L9,5 L2,3.5 L2,6.5 L4.5,8.5 L4.5,9.5 L0,8.5 L-4.5,9.5 L-4.5,8.5 L-2,6.5 L-2,3.5 L-9,5 L-9,3.5 L-2,0 L-1.5,-6 Z",
+    jet:      "M0,-9 L1.3,-5 L1.6,1 L7,4.5 L7,6 L1.6,4.5 L1.6,7 L3.6,9 L3.6,9.8 L0,8.8 L-3.6,9.8 L-3.6,9 L-1.6,7 L-1.6,4.5 L-7,6 L-7,4.5 L-1.6,1 L-1.3,-5 Z",
+    turboprop:"M0,-8 L1.6,-5 L1.8,0 L8.5,2 L8.5,4 L1.8,3.5 L1.8,6.5 L4,8.5 L4,9.4 L0,8.4 L-4,9.4 L-4,8.5 L-1.8,6.5 L-1.8,3.5 L-8.5,4 L-8.5,2 L-1.8,0 L-1.6,-5 Z",
+    light:    "M0,-7 L1.3,-4 L1.5,0.5 L7.5,1.5 L7.5,3.2 L1.5,3 L1.5,6 L3.2,7.8 L3.2,8.6 L0,7.8 L-3.2,8.6 L-3.2,7.8 L-1.5,6 L-1.5,3 L-7.5,3.2 L-7.5,1.5 L-1.5,0.5 L-1.3,-4 Z",
+    heli:     "M0,-3.2 A3.2,3.2 0 1,1 0,3.2 A3.2,3.2 0 1,1 0,-3.2 M0,0 L0,8.5 M-2.2,8.5 L2.2,8.5"
+  };
+
+  // ICAO type -> silhouette. Prefix match, longest first.
+  var TYPE_SHAPES = [
+    [/^(A3[0-9]|A2[0-9]|B7[0-9]|B3[0-9]|B75|B76|B77|B78|MD8|MD9|BCS|E19|E29)/, "airliner"],
+    [/^(CRJ|E17|E19|E75|E13|E14|E45|E135|E145|AT[47]|DH8|SF3|J41|SB20)/, "turboprop"],
+    [/^(GLF|GL[0-9]|CL[0-9]|F900|F2TH|FA[0-9]|LJ[0-9]|C5[0-9]|C6[0-9]|C7[0-9]|E55|E50|BE4|H25|PRM|CL30|G280)/, "jet"],
+    [/^(R22|R44|R66|EC[0-9]|AS[0-9]|B06|B407|B429|S76|H125|H130|A109|MD5|UH|HH)/, "heli"],
+    [/^(C1[0-9]|C2[0-9]|P28|PA[0-9]|DV2|DA[0-9]|SR2|SR22|BE[0-9]|M20|G36|AA5|C82|PC12|TBM|E110)/, "light"]
+  ];
+
+  /* Operator class. ADS-B carries no military flag, so this is a heuristic:
+     a commercial callsign is a 3-letter ICAO airline code plus digits (AAL1578),
+     while US civil registrations show up as N-numbers. Military is inferred from
+     known US armed-forces ICAO hex blocks and common callsign prefixes -- it
+     catches the aircraft that broadcast openly and misses anything that doesn't. */
+  var MIL_CALLSIGN = /^(RCH|REACH|EVAC|PAT|CNV|VV|VM|VR|DOOM|SNTRY|GRIM|TREK|SPAR|SAM|BOXER|HOSS|ROMA|RAIDR|TOPCT|BLADE|TITAN|TABOR|DAWG|BUFF|JEDI|VADER|JOSA|CFC|ASY)/i;
+  function operatorClass(a) {
+    var hex = (a.hex || "").toLowerCase();
+    var n = parseInt(hex, 16);
+    // US military ICAO allocations (ADF1-AFFF range and the AE block).
+    var isMilHex = !isNaN(n) && ((n >= 0xADF7C8 && n <= 0xAFFFFF) || (n >= 0xAE0000 && n <= 0xAEFFFF));
+    var call = (a.flight || "").trim();
+    if (isMilHex || (call && MIL_CALLSIGN.test(call))) return "military";
+    // Airline-style callsign: 3 letters then digits.
+    if (call && /^[A-Z]{3}\d/.test(call)) return "commercial";
+    return "civilian";
+  }
+
+  /* Flight phase from vertical rate plus altitude -- an aircraft below 10,000 ft
+     climbing or descending hard near the field is departing or arriving. */
+  function phaseClass(a) {
+    // A matched runway approach is far stronger evidence than vertical rate.
+    if (a.approach) return "arriving";
+    // Selected altitude reveals intent before the rate catches up.
+    if (a.nav_alt && a.alt !== null && a.alt !== undefined) {
+      var delta = a.nav_alt - a.alt;
+      if (delta < -1500) return "arriving";
+      if (delta > 1500) return "departing";
+    }
+    var rate = a.baro_rate;
+    if (rate === null || rate === undefined) return "cruise";
+    if (rate > 400) return "departing";
+    if (rate < -400) return "arriving";
+    return "cruise";
+  }
+
+  var FILTERS = {
+    op:    { commercial: true, civilian: true, military: true },
+    phase: { departing: true, arriving: true, cruise: true }
+  };
+
+  function passes(a) {
+    return FILTERS.op[operatorClass(a)] && FILTERS.phase[phaseClass(a)];
+  }
+
+  function shapeFor(t, category) {
+    if (t) {
+      for (var i = 0; i < TYPE_SHAPES.length; i++) {
+        if (TYPE_SHAPES[i][0].test(t)) return TYPE_SHAPES[i][1];
+      }
+    }
+    // ADS-B emitter category as fallback: A7 is rotorcraft, A1 light, A5 heavy.
+    if (category === "A7") return "heli";
+    if (category === "A1") return "light";
+    if (category === "A5" || category === "A4") return "airliner";
+    return "jet";
+  }
+
+  function el(name, attrs) {
+    var n = document.createElementNS(SVG, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  /* Looking UP: north stays at top, but east/west swap versus a map, so the
+     default screen angle is -bearing and bearing 90 (E) lands on the left.
+     `rotation` turns the whole chart (point any heading "up"); `mirrored`
+     flips handedness -- turn it off for a map-style view, or to correct for
+     a projector that reverses the image. */
+  var rotation = 0;
+  var mirrored = true;
+
+  function project(bearingDeg, distNm) {
+    var r = Math.min(distNm / MAX_NM, 1) * R;
+    var b = bearingDeg - rotation;
+    var a = ((mirrored ? -b : b) - 90) * Math.PI / 180;
+    return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+  }
+
+  function drawGrid() {
+    var rings = [15, 30, 45, 60];
+    rings.forEach(function (nm) {
+      var r = (nm / MAX_NM) * R;
+      grid.appendChild(el("circle", {
+        cx: CX, cy: CY, r: r,
+        "class": "ring" + (nm === MAX_NM ? " major" : "")
+      }));
+      var t = el("text", { x: CX + 4, y: CY - r + 11, "class": "ring-label" });
+      t.textContent = nm + " nm";
+      grid.appendChild(t);
+    });
+
+    for (var b = 0; b < 360; b += 30) {
+      var p = project(b, MAX_NM);
+      grid.appendChild(el("line", { x1: CX, y1: CY, x2: p.x, y2: p.y, "class": "spoke" }));
+    }
+
+    var marks = [
+      { b: 0, l: "N", c: true }, { b: 45, l: "NE" }, { b: 90, l: "E", c: true },
+      { b: 135, l: "SE" }, { b: 180, l: "S", c: true }, { b: 225, l: "SW" },
+      { b: 270, l: "W", c: true }, { b: 315, l: "NW" }
+    ];
+    marks.forEach(function (m) {
+      var p = project(m.b, MAX_NM * 1.085);
+      var t = el("text", {
+        x: p.x, y: p.y + 4,
+        "class": "compass" + (m.c ? " cardinal" : "")
+      });
+      t.textContent = m.l;
+      grid.appendChild(t);
+    });
+
+    grid.appendChild(el("circle", { cx: CX, cy: CY, r: 13, "class": "center-ring" }));
+    grid.appendChild(el("circle", { cx: CX, cy: CY, r: 2.5, "class": "center-dot" }));
+    var c = el("text", { x: CX, y: CY + 27, "class": "center-label" });
+    c.textContent = "FAIRBORN";
+    grid.appendChild(c);
+  }
+
+  function drawLegend() {
+    var box = document.getElementById("legend");
+    BANDS.slice().reverse().forEach(function (b) {
+      var row = document.createElement("div");
+      row.className = "legend-row";
+      var sw = document.createElement("span");
+      sw.className = "legend-sw";
+      sw.style.background = b.color;
+      var lab = document.createElement("span");
+      lab.textContent = b.label;
+      row.appendChild(sw); row.appendChild(lab);
+      box.appendChild(row);
+    });
+  }
+
+  function fmtAlt(a) {
+    if (a === null || a === undefined) return "—";
+    return (a / 1000).toFixed(a < 10000 ? 1 : 0) + "k";
+  }
+
+  function render(aircraft) {
+    lastAircraft = aircraft;
+    planesG.textContent = "";
+
+    var all = aircraft;
+    aircraft = all.filter(passes);
+    updateChipCounts(all);
+
+    var placed = [];
+    // Draw farthest first so the nearest aircraft -- the ones actually overhead --
+    // claim uncontested label space and sit on top.
+    var byNear = aircraft.slice().sort(function (x, y) {
+      return (y.dst === null ? 9e9 : y.dst) - (x.dst === null ? 9e9 : x.dst);
+    });
+
+    byNear.forEach(function (a) {
+      if (a.dir === null || a.dir === undefined || a.dst === null || a.dst === undefined) return;
+      var p = project(a.dir, a.dst);
+      var band = bandFor(a.alt);
+      var isAlert = a.squawk === "7500" || a.squawk === "7600" || a.squawk === "7700"
+                 || (a.emergency && a.emergency !== "none");
+      // Nearer aircraft read larger -- they are genuinely closer to you.
+      var size = 4.6 + (1 - Math.min(a.dst / MAX_NM, 1)) * 3.4;
+
+      var g = el("g", { "class": "ac" + (selected === a.hex ? " sel" : "") + (isAlert ? " alert" : "") });
+      g.addEventListener("click", function () {
+        selected = (selected === a.hex) ? null : a.hex;
+        render(lastAircraft);
+      });
+
+      // Flown track for the selected aircraft: where it came from, fading with age.
+      if (selected === a.hex && a.track_pts && a.track_pts.length > 1) {
+        var pts = a.track_pts;
+        for (var i = 1; i < pts.length; i++) {
+          var q0 = project(pts[i - 1].dir, pts[i - 1].dst);
+          var q1 = project(pts[i].dir, pts[i].dst);
+          var age = i / pts.length;            // 0 = oldest, 1 = newest
+          var seg = el("line", {
+            x1: q0.x, y1: q0.y, x2: q1.x, y2: q1.y,
+            stroke: bandFor(pts[i].alt).color,
+            "stroke-width": 1 + age * 1.4,
+            "stroke-linecap": "round",
+            opacity: .18 + age * .62
+          });
+          planesG.appendChild(seg);
+        }
+        // Mark the oldest known position so the trail has a readable start.
+        var start = project(pts[0].dir, pts[0].dst);
+        planesG.appendChild(el("circle", {
+          cx: start.x, cy: start.y, r: 2,
+          fill: "none", stroke: band.color, "stroke-width": 1, opacity: .5
+        }));
+      }
+
+      if (selected === a.hex) {
+        g.appendChild(el("circle", { cx: p.x, cy: p.y, r: size + 7, "class": "ac-halo" }));
+      }
+
+      // Silhouette, rotated to heading in the same mirrored/rotated space.
+      // Screen-rotation of the glyph is the negative of the plotting angle
+      // convention, so the nose points where the aircraft is actually going.
+      var hdg = (a.track === null || a.track === undefined) ? null : a.track - rotation;
+      var glyphRot = hdg === null ? 0 : (mirrored ? -hdg : hdg);
+      var scale = size / 6.4;
+      var shape = el("path", {
+        d: SHAPES[shapeFor(a.type, a.category)],
+        "class": "ac-body",
+        fill: band.color, "fill-opacity": .30, stroke: band.color,
+        transform: "translate(" + p.x.toFixed(2) + "," + p.y.toFixed(2) + ") " +
+                   "rotate(" + glyphRot.toFixed(1) + ") scale(" + scale.toFixed(3) + ")"
+      });
+      if (SHAPES[shapeFor(a.type, a.category)] === SHAPES.heli) {
+        shape.setAttribute("fill-opacity", ".18");
+      }
+      g.appendChild(shape);
+
+      var right = p.x < CX;
+      var lx = p.x + (right ? size + 7 : -(size + 7));
+      var anchor = right ? "start" : "end";
+
+      // De-conflict labels: nudge down until this one clears those already placed.
+      var ly = p.y - 1;
+      var guard = 0;
+      while (guard++ < 14 && placed.some(function (q) {
+        return Math.abs(q.x - lx) < 78 && Math.abs(q.y - ly) < 13;
+      })) { ly += 13; }
+      placed.push({ x: lx, y: ly });
+
+      // If the label drifted off its dot, tether it with a hairline.
+      if (ly - p.y > 8) {
+        g.appendChild(el("line", {
+          x1: p.x + (right ? size + 2 : -(size + 2)), y1: p.y,
+          x2: lx, y2: ly - 3,
+          stroke: band.color, "stroke-width": .75, opacity: .35
+        }));
+      }
+
+      var lbl = el("text", { x: lx, y: ly, "class": "ac-label", fill: band.color, "text-anchor": anchor });
+      lbl.textContent = a.flight || a.reg || a.hex;
+      g.appendChild(lbl);
+
+      var sub = el("text", { x: lx, y: ly + 9.5, "class": "ac-sub", "text-anchor": anchor });
+      sub.textContent = fmtAlt(a.alt) + (a.type ? " · " + a.type : "");
+      g.appendChild(sub);
+
+      planesG.appendChild(g);
+    });
+
+    // Stats
+    document.getElementById("n-total").textContent =
+      aircraft.length + (aircraft.length !== all.length ? " / " + all.length : "");
+    document.getElementById("n-near").textContent =
+      aircraft.filter(function (a) { return a.dst !== null && a.dst < 15; }).length;
+    document.getElementById("n-low").textContent =
+      aircraft.filter(function (a) { return a.alt !== null && a.alt < 10000; }).length;
+
+    // Rail
+    listEl.textContent = "";
+    aircraft.forEach(function (a) {
+      var band = bandFor(a.alt);
+      var row = document.createElement("div");
+      row.className = "row" + (selected === a.hex ? " sel" : "");
+      row.addEventListener("click", function () {
+        selected = (selected === a.hex) ? null : a.hex;
+        render(lastAircraft);
+      });
+
+      var sw = document.createElement("div");
+      sw.className = "swatch";
+      sw.style.background = band.color;
+
+      var mid = document.createElement("div");
+      var call = document.createElement("div");
+      call.className = "call";
+      call.style.color = band.color;
+      call.textContent = a.flight || a.reg || a.hex;
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = a.desc || a.type || a.operator || "unknown type";
+      if (a.approach) {
+        var badge = document.createElement("span");
+        badge.className = "appr";
+        badge.textContent = "→ " + (a.approach.iata || a.approach.airport) + " " + a.approach.runway;
+        meta.appendChild(badge);
+      }
+      mid.appendChild(call); mid.appendChild(meta);
+
+      var nums = document.createElement("div");
+      nums.className = "nums";
+      var d = (a.dst !== null && a.dst !== undefined) ? a.dst.toFixed(1) + " nm" : "—";
+      var climb = a.baro_rate > 200 ? " ↑" : (a.baro_rate < -200 ? " ↓" : "");
+      nums.innerHTML = fmtAlt(a.alt) + " ft" + climb + "<br>" + d;
+
+      row.appendChild(sw); row.appendChild(mid); row.appendChild(nums);
+      listEl.appendChild(row);
+    });
+
+    // Detail panel for the selected aircraft
+    var detail = document.getElementById("detail");
+    var sel = aircraft.filter(function (a) { return a.hex === selected; })[0];
+    if (sel) {
+      var b = bandFor(sel.alt);
+      var n = sel.track_pts ? sel.track_pts.length : 0;
+      var trackNote;
+      if (n > 1) {
+        var span = (n - 1) * POLL_MS / 1000;
+        var mins = Math.floor(span / 60), secs = Math.round(span % 60);
+        var first = sel.track_pts[0], last = sel.track_pts[n - 1];
+        var climbed = (first.alt !== null && last.alt !== null && first.alt !== undefined
+                       && last.alt !== undefined) ? last.alt - first.alt : null;
+        trackNote = "Track: " + n + " positions over " +
+          (mins ? mins + "m " : "") + secs + "s" +
+          (climbed !== null && Math.abs(climbed) > 100
+            ? " · " + (climbed > 0 ? "climbed " : "descended ") +
+              Math.abs(climbed).toLocaleString() + " ft"
+            : "");
+      } else {
+        trackNote = "Track: building — first seen this poll. The trail draws as it flies.";
+      }
+
+      detail.innerHTML = "";
+      var head = document.createElement("div");
+      head.className = "d-call";
+      head.style.color = b.color;
+      head.textContent = sel.flight || sel.reg || sel.hex;
+      if (sel.flight && sel.reg) {
+        var reg = document.createElement("span");
+        reg.style.cssText = "font-size:10px;font-weight:400;color:var(--ink-faint)";
+        reg.textContent = sel.reg;
+        head.appendChild(reg);
+      }
+      detail.appendChild(head);
+
+      var desc = document.createElement("div");
+      desc.className = "d-desc";
+      desc.textContent = sel.desc || sel.type || "unknown type";
+      if (sel.operator) desc.textContent += " · " + sel.operator;
+      detail.appendChild(desc);
+
+      var grid = document.createElement("div");
+      grid.className = "d-grid";
+      [
+        ["Altitude", sel.alt !== null ? sel.alt.toLocaleString() + " ft" : "—"],
+        ["Ground spd", sel.gs !== null && sel.gs !== undefined ? Math.round(sel.gs) + " kt" : "—"],
+        ["Distance", sel.dst !== null && sel.dst !== undefined ? sel.dst.toFixed(1) + " nm" : "—"],
+        ["Bearing", sel.dir !== null && sel.dir !== undefined ? Math.round(sel.dir) + "°" : "—"],
+        ["Heading", sel.track !== null && sel.track !== undefined ? Math.round(sel.track) + "°" : "—"],
+        ["Squawk", sel.squawk || "—"]
+      ].forEach(function (kv) {
+        var cell = document.createElement("div");
+        var k = document.createElement("div"); k.className = "d-k"; k.textContent = kv[0];
+        var v = document.createElement("div"); v.className = "d-v"; v.textContent = kv[1];
+        cell.appendChild(k); cell.appendChild(v);
+        grid.appendChild(cell);
+      });
+      detail.appendChild(grid);
+
+      if (sel.approach) {
+        var ap = document.createElement("div");
+        ap.className = "d-track";
+        ap.style.color = "var(--low)";
+        ap.textContent = "Approaching " + sel.approach.airport + " runway " +
+          sel.approach.runway + " — " + sel.approach.distance_nm + " nm out, " +
+          sel.approach.agl_ft.toLocaleString() + " ft AGL, " +
+          sel.approach.alignment_deg + "° off centreline";
+        detail.appendChild(ap);
+      }
+      if (sel.nav_alt) {
+        var nv = document.createElement("div");
+        nv.className = "d-track";
+        var delta = sel.alt !== null ? sel.nav_alt - sel.alt : 0;
+        // 200 ft covers the rounding in MCP readouts without calling a real
+        // 400 ft descent "level".
+        nv.textContent = "Selected altitude " + sel.nav_alt.toLocaleString() + " ft" +
+          (Math.abs(delta) > 200
+            ? " — " + (delta > 0 ? "climbing to" : "descending to") + " it"
+            : " (level)") +
+          (sel.nav_modes && sel.nav_modes.length ? " · " + sel.nav_modes.join(", ") : "");
+        detail.appendChild(nv);
+      }
+
+      var tn = document.createElement("div");
+      tn.className = "d-track";
+      tn.textContent = trackNote;
+      detail.appendChild(tn);
+      detail.hidden = false;
+    } else {
+      detail.hidden = true;
+    }
+
+    if (!aircraft.length) {
+      var empty = document.createElement("div");
+      empty.style.cssText = "padding:22px 18px;font-size:12px;color:var(--ink-faint)";
+      empty.textContent = all.length
+        ? "All " + all.length + " aircraft are hidden by the current filters."
+        : "No aircraft in range right now. Quiet sky.";
+      listEl.appendChild(empty);
+    }
+  }
+
+  function tick() {
+    fetch("/api/flights", { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        render(d.aircraft || []);
+        pulseEl.className = "pulse live";
+        var t = new Date((d.now || Date.now() / 1000) * 1000);
+        statusEl.textContent = "live · " + d.source + " · " +
+          t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      })
+      .catch(function (e) {
+        pulseEl.className = "pulse err";
+        statusEl.textContent = "feed unavailable — retrying";
+      });
+  }
+
+  function redraw() {
+    grid.textContent = "";
+    drawGrid();
+    render(lastAircraft);
+  }
+
+  var CHIPS = {
+    op: [["commercial", "comm"], ["civilian", "civil"], ["military", "mil"]],
+    phase: [["departing", "dep ↑"], ["arriving", "arr ↓"], ["cruise", "cruise"]]
+  };
+
+  function buildChips() {
+    ["op", "phase"].forEach(function (group) {
+      var host = document.getElementById("f-" + group);
+      CHIPS[group].forEach(function (pair) {
+        var key = pair[0];
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip on";
+        btn.setAttribute("aria-pressed", "true");
+        btn.dataset.group = group;
+        btn.dataset.key = key;
+        btn.innerHTML = pair[1] + ' <span class="cnum"></span>';
+        btn.addEventListener("click", function (ev) {
+          var f = FILTERS[group];
+          var keys = CHIPS[group].map(function (x) { return x[0]; });
+          var onNow = keys.filter(function (k) { return f[k]; });
+          var isSolo = onNow.length === 1 && f[key];
+
+          if (ev.shiftKey || ev.metaKey || ev.ctrlKey) {
+            // Additive: add or remove this one from the current selection.
+            f[key] = !f[key];
+          } else if (isSolo) {
+            // Clicking the only active chip clears back to "show everything".
+            keys.forEach(function (k) { f[k] = true; });
+          } else {
+            // Plain click selects just this category -- the gesture people expect.
+            keys.forEach(function (k) { f[k] = (k === key); });
+          }
+
+          // Never let a group filter everything out; that reads as a broken page.
+          if (!keys.some(function (k) { return f[k]; })) {
+            keys.forEach(function (k) { f[k] = true; });
+          }
+          syncChips();
+          render(lastAircraft);
+        });
+        host.appendChild(btn);
+      });
+    });
+  }
+
+  function syncChips() {
+    document.querySelectorAll("#f-op > .chip, #f-phase > .chip").forEach(function (btn) {
+      var on = FILTERS[btn.dataset.group][btn.dataset.key];
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", String(on));
+    });
+  }
+
+  function updateChipCounts(all) {
+    document.querySelectorAll("#f-op > .chip, #f-phase > .chip").forEach(function (btn) {
+      var group = btn.dataset.group, key = btn.dataset.key;
+      var fn = group === "op" ? operatorClass : phaseClass;
+      var n = all.filter(function (a) { return fn(a) === key; }).length;
+      btn.querySelector(".cnum").textContent = n;
+      btn.classList.toggle("off-state", n === 0);
+    });
+  }
+
+  var rotEl = document.getElementById("rot");
+  var rotV = document.getElementById("rot-v");
+  var mirrorEl = document.getElementById("mirror");
+
+  function rotLabel() {
+    if (rotation === 0) return "N up";
+    var dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+    var near = dirs[Math.round(rotation / 45) % 8];
+    return rotation + "° · " + near + " up";
+  }
+
+  rotEl.addEventListener("input", function () {
+    rotation = Number(rotEl.value);
+    rotV.textContent = rotLabel();
+    redraw();
+  });
+
+  mirrorEl.addEventListener("click", function () {
+    mirrored = !mirrored;
+    mirrorEl.classList.toggle("on", mirrored);
+    mirrorEl.setAttribute("aria-pressed", String(mirrored));
+    mirrorEl.textContent = mirrored ? "mirrored" : "map view";
+    document.querySelector(".mirror-note").innerHTML = mirrored
+      ? "mirrored view — you are<br>facing up, head to north.<br>east sits to your left."
+      : "map view — north up,<br>east right, as drawn<br>on a chart.";
+    redraw();
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    rotation = 0; rotEl.value = 0; rotV.textContent = rotLabel();
+    if (!mirrored) mirrorEl.click(); else redraw();
+  });
+
+  buildChips();
+  drawGrid();
+  drawLegend();
+  tick();
+  setInterval(tick, POLL_MS);
+})();
+</script>
+</body>
+</html>

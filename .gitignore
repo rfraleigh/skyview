@@ -1,0 +1,13 @@
+# Virtualenv
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Runtime artifacts
+server.log
+*.tmp
+
+# Screenshots / scratch
+shot*.png

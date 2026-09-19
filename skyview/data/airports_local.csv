@@ -1,0 +1,354 @@
+ident,type,name,latitude_deg,longitude_deg,elevation_ft,iata_code,municipality
+02IN,small_airport,Diamond P. Field,40.208900451660156,-85.54080200195312,904,,Muncie
+04I,small_airport,Columbus Southwest Airport,39.91151,-83.188577,920,,Columbus
+06OI,small_airport,Green Acres Airport,39.734798431396484,-84.3822021484375,915,,New Lebanon
+07IN,small_airport,Gray Airport,39.573699951171875,-85.91390228271484,750,,Boggstown
+0D7,small_airport,Ada Airport,40.7906,-83.829102,949,,Ada
+0II0,small_airport,Chuck's Airport,40.258381,-85.253348,955,,Albany
+0II7,small_airport,Frost Field,39.79560089111328,-85.78610229492188,900,,Greenfield
+0IN2,small_airport,The Lazy K Airport,40.82780075073242,-85.08609771728516,835,,Tocsin
+0IN4,small_airport,Air Park Field,41.127405,-84.953306,750,,New Haven
+0KY0,small_airport,Owen Air Park,38.622798919677734,-84.77890014648438,890,,Owenton
+0OH6,small_airport,Fry Field,39.60060119628906,-84.01969909667969,775,,Spring Valley
+0OH8,small_airport,Fry Airport,40.18840026855469,-84.256103515625,900,,Piqua
+0OI2,small_airport,Unger Field,39.359798431396484,-83.4177017211914,940,,Greenfield
+0OI9,small_airport,Hidden Quarry Airport,38.894500732421875,-83.1135025024414,830,,Lucasville
+11OA,small_airport,Hide-A-Way Hills Resort Airport,39.64310073852539,-82.466796875,780,,Bremen
+12II,small_airport,Pentecost Airport,39.856272,-84.973464,1020,,Richmond
+12OH,small_airport,McGregor Airfield,39.834773,-84.333486,940,,Brookville
+13IN,small_airport,Gage Airport,40.814484,-84.927803,814,,Decatur
+14OH,small_airport,Heilman Airport,40.66889953613281,-83.44349670410156,930,,Kenton
+16OH,small_airport,Maci's Landing,39.483011,-82.813534,805,,Kingston
+16OI,small_airport,Trump Airport,40.125301361083984,-84.5824966430664,1038,,Greenville
+17IN,small_airport,Pruss Airport,38.978401,-85.109703,890,,Dillsboro
+17OI,small_airport,Haas Airport,39.226382,-83.317583,750,,Bainbridge
+19KY,small_airport,Charlie Bravo's Airport,38.706482,-84.600217,940,,Dry Ridge
+1II0,small_airport,Webster Airport,39.576698303222656,-85.58779907226562,910,,Homer
+1II8,small_airport,Morris Airport,39.814009,-85.819184,870,,Greenfield
+1IN9,small_airport,Lee Farms Airport,40.594916,-85.424473,856,,Marion
+1OA1,small_airport,Bashore Airport,40.0458984375,-84.33439636230469,940,,Pleasant Hill
+1OA4,small_airport,Kepes Flying Field,39.92359924316406,-83.66169738769531,1080,,Springfield
+1OA5,small_airport,Double J Airport,39.21950149536133,-83.95269775390625,972,,Fayetteville
+1OA6,small_airport,Frith Airport,39.33620071411133,-84.0457992553711,910,,Morrow
+1OH1,small_airport,S and S Field,40.30139923095703,-83.9760971069336,1057,,Quincy
+1OH8,small_airport,Lisbon Airfield,39.86669921875,-83.63330078125,1160,,South Charleston
+1OH9,small_airport,Lewis Airport,38.93510055541992,-83.39939880371094,862,,Peebles
+1OI6,small_airport,Stone Airport,39.77009963989258,-84.4166030883789,978,,New Lebanon
+1OI9,small_airport,Mc Colloch's Airport,40.177299499499995,-84.29440307620001,990,,Piqua
+1WF,small_airport,Waco Field,40.014801025390625,-84.1980972290039,820,,Troy
+20KY,small_airport,Madi's Meadows Airport,38.815704,-84.674006,880,,Verona
+21OI,small_airport,Clearwater Airpark,39.128101,-84.092697,905,,Batavia
+24OI,small_airport,Reeds Airport,40.07780075073242,-83.89720153808594,1200,,St Paris
+27OH,small_airport,Schaller Airport,40.94670104980469,-83.67990112304688,830,,Findlay
+2B6,small_airport,Hollister Field,39.437599182128906,-83.70829772949219,1090,,Wilmington
+2II3,small_airport,Stottlemyer Airport,40.229283,-85.816269,865,,Frankton
+2IN0,small_airport,Skip's Place Airport,40.83689880371094,-85.17109680175781,858,,Ossian
+2IN5,small_airport,Midkiff Airport,40.015201568603516,-85.472900390625,1038,,Sulphur Springs
+2IN6,small_airport,Galloway Airport,40.041901,-85.916901,830,,Noblesville
+2KT1,small_airport,JDH Airport,38.588456,-83.900037,852,,Marysville
+2OA2,small_airport,Mackie's Airport,39.247897,-83.916378,993,,Midland
+2OA4,small_airport,Victory Field,39.931391,-83.908863,1055,,Bethel Township
+2OA5,small_airport,Fl-Airfield,40.182498931884766,-83.35089874267578,980,,Marysville
+2OA7,small_airport,Utter Field,38.85139847,-84.10559845,890,,Felicity
+2OH0,small_airport,Bohannan Airport,40.34432,-82.937175,960,,Kilbourne
+2OH4,small_airport,Cedar Creek Airport,40.6245002746582,-82.635498046875,1220,,Shauck
+2OH6,small_airport,Smith Field Airport,40.012001,-84.281303,935,,Troy
+2OH7,small_airport,Jbr Airport,38.911201477051,-84.026000976562,945,,Hamersville
+2OH8,small_airport,Port-O-John Airport,39.7952995300293,-83.22319793701172,925,,Derby
+2OH9,small_airport,Caesar Creek Soaring Club Gliderport,39.4767,-84.093803,940,,Waynesville
+2OI2,small_airport,Air Jordan Airport,39.561100006103516,-84.0519027709961,920,,Waynesville
+32II,small_airport,Roberts Airport,38.81639862060547,-85.1063003540039,820,,Vevay
+33OH,small_airport,Sunset Strip,40.185298919677734,-83.17359924316406,945,,Jerome
+34II,small_airport,Burk Personal Use Airport,40.050816,-85.602318,930,,Anderson
+36OI,small_airport,Verhoff Airport,41.07310104370117,-84.21269989013672,728,,Continental
+37I,small_airport,Troy Skypark Airport,39.990898,-84.2705,930,,Troy
+38I,small_airport,Weller Airport,40.091202,-83.6894,1150,,Urbana
+38OH,small_airport,Industry Air Park,39.84479904174805,-82.57959747314453,877,,Baltimore
+38OI,small_airport,Ronshausen Airport,39.684863,-83.07045,750,,Circleville
+39IN,small_airport,Roberts Field,40.00230026245117,-85.42890167236328,1085,,Sulphur Springs
+3II3,small_airport,Basting Airport,41.090865,-84.831126,755,,Woodburn
+3IN1,small_airport,Weimer Field,39.819266,-85.569015,990,,Knightstown
+3KY4,small_airport,Craw Daddy Landing Airport,38.67279815673828,-85.18280029296875,460,,Carrollton
+3OH0,small_airport,Andy Barnhart Memorial Airport,39.930317,-84.013429,895,,New Carlisle
+3OH1,small_airport,Morningstar North Airport,39.69729995727539,-84.5427017211914,982,,West Alexandria
+3OH6,small_airport,Youngpeter Airport,40.78329849243164,-84.3677978515625,815,,Delphos
+3OH7,small_airport,Creager Airport,39.030102,-84.0466,895,,Williamsburg
+3OH9,small_airport,Merts Field,39.562026,-83.857784,1010,,Wilmington
+40I,small_airport,Red Stewart Airfield,39.50529861450195,-84.12190246582031,955,,Waynesville
+43OA,small_airport,Anderson Airfield,39.581422,-84.092783,940,,Waynesville
+43OI,small_airport,Windswept Airport,41.198699951171875,-83.70079803466797,710,,North Baltimore
+45OH,small_airport,Boober Airport,38.975994,-84.219511,854,,New Richmond
+4II8,small_airport,Willis Airport,39.725591,-85.714881,880,,Greenfield
+4KT4,small_airport,Steele's Bottom Airport,38.828736,-84.817321,495,,Warsaw
+4KY7,small_airport,Mueller Farm Airport,38.823494,-84.686273,890,,Verona
+4OA8,small_airport,Bowman Airport,40.108319,-84.299312,980,,Piqua
+4OI9,small_airport,Baisden Airport,39.10219955444336,-82.61070251464844,730,,Coalton
+52OA,small_airport,Area 52 Airport,40.100269,-82.59654,1060,,Alexandria
+53II,small_airport,Steinman Airport,41.073101,-84.840797,760,,Woodburn
+53OH,small_airport,Charloe Airport,41.134498596191406,-84.45079803466797,721,,Paulding
+54OH,small_airport,Buehler Airport,41.1234016418457,-84.6176986694336,728,,Paulding
+56IN,small_airport,Casad Industrial Park Airport,41.077799,-84.940453,766,,New Haven
+57OH,small_airport,Flying W Airport,39.623292,-82.745972,901,,Amanda
+57OI,small_airport,Logan's Chance Airport,39.996700286865234,-83.85469818115234,1100,,Lawrenceville
+58II,small_airport,Eagles Nest Airport,39.520901,-85.899544,770,,Boggstown
+59OH,small_airport,Kelch Airport,38.97529983520508,-84.0342025756836,905,,Bethel
+5E9,small_airport,Packer Airport,40.407854,-83.215183,918,,Radnor
+5IG9,small_airport,Kramer Airfield,40.015632,-85.432728,1062,,Sulphur Springs
+5OI0,small_airport,Rohrer Airport,39.28419876098633,-84.2113037109375,800,,Loveland
+5OI5,small_airport,Hamrick Airport,40.69340133666992,-84.78050231933594,810,,Willshire
+5OI8,small_airport,McKnight Airport,40.19368,-82.65667,1172,,Johnstown
+61KY,small_airport,Schroder Airport,38.55009841918945,-84.76329803466797,910,,Owenton
+62OH,small_airport,Willard Field,39.694503,-82.467542,820,,Lancaster
+63OH,small_airport,White's Airport,39.702801,-83.093903,815,,Circleville
+63OI,small_airport,Bowman Field,40.33509826660156,-83.13600158691406,965,,Delaware
+64IN,small_airport,Peacock Farms Airport,40.43479919433594,-85.62550354003906,875,,Fairmount
+66II,small_airport,Pat Robinson Airport,40.042198181152344,-85.86530303955078,865,,Lapel
+66IN,small_airport,Oakes Field,39.787498474121094,-85.63690185546875,935,,Charlottesville
+67II,small_airport,Schoettmer Farm Airport,39.37139892578125,-85.59220123291016,875,,Greensburg
+69OI,small_airport,Schulze's Airport,40.95009994506836,-82.92489624023438,1000,,Chatfield
+6C2,small_airport,Ohio Dusting Co Inc Airport,40.952869,-83.982243,765,,Pandora
+6D7,small_airport,Deshler Municipal Landing Strip,41.21590042114258,-83.87439727783203,706,,Deshler
+6II2,small_airport,Willis Site Number 2 Airport,39.733398,-85.723297,881,,Greenfield
+6IN2,small_airport,Whelen Airport,39.49359893798828,-85.64859771728516,870,,Waldron
+6IN4,small_airport,Fischer Field,39.466009,-85.699303,835,,Waldron
+6IN5,small_airport,Foghorn Farms Airport,40.032798767089844,-85.78359985351562,870,,Pendleton
+6IN8,small_airport,Mcminn Airport,39.52859878540039,-85.31670379638672,1065,,Rushville
+6OH9,small_airport,Kemps Field of Dreams Airport,40.105899810791016,-84.39990234375,974,,Covington
+6OI5,small_airport,Mitchell Airport,40.137298583984375,-83.21800231933594,950,,Plain City
+70II,small_airport,Nasby Airport,39.522238,-85.686053,830,,Shelbyville
+70IN,small_airport,Lewis Airfield,39.18170166015625,-85.15129852294922,989,,Milan
+71KY,small_airport,Sunrise Acres Airport,39.0348014832,-84.8727035522,465,,Petersburg
+72OH,small_airport,No Fly Zone Airport,40.035334,-84.077344,1006,,Casstown
+73II,small_airport,Nulltown Wingnuts Ultralightport,39.57170104980469,-85.15859985351562,765,,Connersville
+74IN,small_airport,Tucker Farms Airport,40.56840133667,-85.344398498535,865,,Montpelier
+75OI,small_airport,Soltis Field,40.503700256347656,-83.09020233154297,950,,Marion
+77OH,small_airport,Collins-Flege Airpark,39.36280059814453,-84.34130096435547,860,,Mason
+79II,small_airport,Sauer-Harter Airport,39.883399963378906,-85.70249938964844,930,,Greenfield
+7B4,small_airport,Miller Farm Landing Strip,39.884498596191406,-82.58910369873047,930,,Baltimore
+7I2,small_airport,Reese Airport,40.155392,-85.318923,991,,Muncie
+7IN9,small_airport,The Last Resort Airport,40.037498474121094,-85.41059875488281,1070,,Springport
+7KY2,small_airport,Ryan Field,38.802661,-84.661861,890,,Verona
+7OA7,small_airport,Skydive Greene County Inc Airport,39.67919921875,-83.87079620361328,1055,,Xenia
+7OH3,small_airport,Obi One Airport,40.35279846191406,-83.0510025024414,952,,Delaware
+7OI9,small_airport,Massengill Airport,40.069000244140625,-82.13600158691406,955,,Nashport
+82OI,small_airport,J-Em Farm Airport,40.15420150756836,-83.27490234375,1005,,Columbus
+83OA,small_airport,Hufford Field,40.158611,-84.594167,1035,,Greenville
+83OH,small_airport,Adams Strip,40.062302,-84.379402,973,,Pleasant Hill
+8GK,small_airport,Gallatin County Airport,38.679499,-84.928898,830,,Sparta
+8I1,small_airport,Robinson Airport,38.69449996948242,-85.19830322265625,484,,Vevay
+8II0,small_airport,Allen and Gloss Airport,38.856998443603516,-85.10130310058594,880,,Bennington
+8II2,small_airport,Norris Field,39.652607,-84.866417,1085,,Liberty
+8II5,small_airport,Holt Field,40.899436,-85.000491,790,,Hoagland
+8IN7,small_airport,Brush Creek Airport,39.0452995300293,-85.51529693603516,825,,Butlerville
+8KY6,small_airport,Caintuckee Airport,38.93441,-84.566488,930,,Independence
+8OI5,small_airport,Clum Airport,39.88169860839844,-82.41459655761719,1115,,Thornville
+8OI9,small_airport,Morkassel Field,39.09920120239258,-83.1166000366211,850,,Idaho
+90OI,small_airport,Joe Cimprich Airport,39.60419845581055,-84.63500213623047,1010,,Camden
+93IN,small_airport,Foltz Farm Airport,39.5886,-85.736099,820,,Shelbyville
+95OH,small_airport,Tong Farm Airport,40.97090148925781,-83.45829772949219,840,,Carey
+9II8,small_airport,Francis Airport,39.08610153198242,-85.37110137939453,920,,Holton
+9IN0,small_airport,Smith Field,40.453438,-85.288754,902,,Hartford City
+9OA5,small_airport,Buckeye Executive Airport,39.961215,-82.540723,914,,Hebron
+9OH7,small_airport,Lutz Airport,40.961700439453125,-83.59519958496094,808,,Findlay
+9OH8,small_airport,Ferrell Airport,40.97639846801758,-83.6416015625,815,,Findlay
+9OI3,small_airport,Johns Landing Airport,39.89860153198242,-82.11029815673828,1000,,Zanesville
+9OI5,small_airport,Transportation Research Center of Ohio Airport,40.308101654052734,-83.54170227050781,1100,,East Liberty
+C40,small_airport,Miller Airport,40.716702,-85.25,845,,Bluffton
+I19,small_airport,Greene County/Lewis A. Jackson Regional Airport,39.690807,-83.992585,949,,Dayton
+I44,small_airport,Dahio Trotwood Airport,39.765072,-84.343166,925,,Dayton
+I61,small_airport,Hagerstown Airport,39.889198303222656,-85.16329956054688,1000,,Hagerstown
+I62,small_airport,Schaney's Lair Airport,39.859839,-84.435192,1037,,Brookville
+I99,small_airport,Alexandria Airport,40.232498,-85.637497,900,,Alexandria
+IG04,small_airport,Litzinger Ultralightport,39.046101,-85.1567,970,,Milan
+IG07,small_airport,Josephs Field,39.05690002441406,-85.03559875488281,860,,Moores Hill
+II01,small_airport,Grandlienard-Hogg Airport,40.75619888305664,-85.25050354003906,830,,Bluffton
+II03,small_airport,Buell Airport,39.19860076904297,-85.13639831542969,990,,Milan
+II06,small_airport,Ferrell Airport,39.970001220703125,-85.4708023071289,1070,,Cadiz
+II13,small_airport,Sugar Creek Air Park,39.920278,-85.598611,1000,,Markleville
+II20,small_airport,Mossburg Airport,40.67369842529297,-85.26329803466797,845,,Liberty Center
+II36,small_airport,Mc Neil Field,39.665298461899994,-85.81670379639999,862,,Fountaintown
+II42,small_airport,Creekside Farm Airport,40.0686,-85.922203,800,,Noblesville
+II54,small_airport,Giltner Airport,38.81589889526367,-85.44640350341797,850,,Madison
+II67,small_airport,Hickory Hills Airport,40.427349,-85.373694,900,,Hartford City
+II71,small_airport,Smith Airport,39.386398315399994,-85.6172027588,900,,St. Paul
+II72,small_airport,Anderson Airport,39.19580078125,-85.20559692382812,965,,Sunman
+II77,small_airport,Finney's Airpark,40.259498596191406,-85.260498046875,965,,Albany
+II78,small_airport,Wallace Field,39.8583984375,-85.60160064697266,995,,Wilkinson
+II85,small_airport,Blomenberg Airport,40.89619827270508,-85.04910278320312,800,,Decatur
+II86,small_airport,Poole Airport,40.01559829711914,-85.88749694824219,860,,Noblesville
+II94,small_airport,Irion Airport,40.12839889526367,-85.88610076904297,800,,Noblesville
+II97,small_airport,Solenberg Airport,39.47779846191406,-85.88330078125,720,,Shelbyville
+IN05,small_airport,Stevens Farms Airport,39.66059875488281,-85.54830169677734,930,,Rushville
+IN31,small_airport,Hanna Airport,40.022301,-85.753891,870,,Pendleton
+IN49,small_airport,Pherigo Airport,39.48551,-85.80324,760,,Shelbyville
+IN56,small_airport,Carroll's Airpark,40.12689971923828,-85.43190002441406,940,,Muncie
+IN72,small_airport,Mayer Airport,40.7859001159668,-85.24420166015625,820,,Union Dale
+IN81,small_airport,Small Field,39.75189971923828,-85.55750274658203,920,,Carthage
+IN91,small_airport,Valhalla Airport,41.00212,-84.994268,810,,Fort Wayne
+K0I8,small_airport,Cynthiana-Harrison County Airport,38.366199,-84.283302,721,,Cynthiana
+K12G,small_airport,Shelby Community Airport,40.872898,-82.697403,1120,,Shelby
+K16G,small_airport,Seneca County Airport,41.094101,-83.212502,786,,Tiffin
+K17G,small_airport,Port Bucyrus-Crawford County Airport,40.781803,-82.974408,1003,,Bucyrus
+K22I,small_airport,Vinton County Airport,39.328098,-82.441803,958,,Mc Arthur
+K3I7,small_airport,Dayton-Phillipsburg Airport,39.913305,-84.400398,1031,,Phillipsburg
+K4I3,small_airport,Knox County Airport,40.328701,-82.523804,1191,,Mount Vernon
+K4I9,small_airport,Morrow County Airport,40.524502,-82.850098,1085,,Mount Gilead
+K56D,small_airport,Wyandot County Airport,40.8834,-83.314499,830,,Upper Sandusky
+K5G7,small_airport,Bluffton Airport,40.885399,-83.868599,851,,Bluffton
+K6G4,small_airport,Wynkoop Airport,40.3651008605957,-82.49569702148438,1041,,Mount Vernon
+KAID,small_airport,Anderson Municipal Darlington Field,40.10860061649999,-85.6129989624,919,AID,Anderson
+KAMT,small_airport,Alexander Salamon Airport,38.851501,-83.566299,896,,West Union
+KAOH,small_airport,Lima Allen County Airport,40.706902,-84.026703,975,AOH,Lima
+KAXV,small_airport,Neil Armstrong Airport,40.49340057,-84.29889679,913,AXV,Wapakoneta
+KCEV,small_airport,Mettel Field,39.6985015869,-85.129699707,867,CEV,Connersville
+KCMH,large_airport,John Glenn Columbus International Airport,39.998001,-82.891899,815,CMH,Columbus
+KCQA,small_airport,Lakefield Airport,40.4841,-84.560097,894,,Celina
+KCVG,large_airport,Cincinnati Northern Kentucky International Airport,39.048801,-84.667801,896,CVG,Cincinnati / Covington
+KCYO,small_airport,Pickaway County Memorial Airport,39.515999,-82.982101,684,,Circleville
+KDAY,medium_airport,James M. Cox Dayton International Airport,39.902401,-84.219398,1009,DAY,Dayton
+KDLZ,small_airport,Delaware Municipal Airport,40.279701,-83.114799,945,,Delaware
+KEDJ,small_airport,Bellefontaine Regional Airport,40.372299,-83.819,1122,,Bellefontaine
+KEOP,small_airport,Pike County Airport,39.166901,-82.9282,660,,Waverly
+KFDY,medium_airport,Findlay Airport,41.013500213600004,-83.66870117190001,813,FDY,Findlay
+KFFO,medium_airport,Wright-Patterson Air Force Base,39.826099,-84.048302,823,FFO,Dayton
+KFGX,small_airport,Fleming Mason Airport,38.5418014526,-83.74340057370001,913,,Flemingsburg
+KFWA,medium_airport,Fort Wayne International Airport,40.978896,-85.194465,814,FWA,Fort Wayne
+KFZI,small_airport,Fostoria Metropolitan Airport,41.1908,-83.394501,752,,Fostoria
+KGEO,small_airport,Brown County Airport,38.881901,-83.882698,958,,Georgetown
+KGEZ,small_airport,Shelbyville Municipal Airport,39.586044,-85.804024,803,,Shelbyville
+KGFD,small_airport,Pope Field,39.790715,-85.735019,895,GFD,Greenfield
+KGQQ,small_airport,Galion Municipal Airport,40.7533988953,-82.7238006592,1224,GQQ,Galion
+KHAO,small_airport,Butler Co Regional Airport - Hogan Field,39.363800048799995,-84.5220031738,633,HAO,Hamilton
+KHLB,small_airport,Batesville Airport,39.342861,-85.258441,973,HLB,Batesville
+KHOC,small_airport,Highland County Airport,39.188801,-83.538803,977,,Hillsboro
+KI12,small_airport,Sidney Municipal Airport,40.241402,-84.150902,1044,,Sidney
+KI17,small_airport,Piqua Airport-Hartzell Field,40.16469955,-84.30840302,994,,Piqua
+KI22,small_airport,Randolph County Airport,40.1689,-84.925697,1119,,Winchester
+KI23,small_airport,Fayette County Airport,39.5704,-83.420502,980,,Washington Court House
+KI34,small_airport,Greensburg Municipal Airport,39.32690048,-85.52249908,912,,Greensburg
+KI43,small_airport,James A Rhodes Airport,38.9814,-82.577904,726,,Jackson
+KI54,small_airport,Mad River Airpark,40.0201,-83.828499,958,,Tremont City
+KI66,small_airport,Clinton County Airport,39.5033,-83.862801,1033,,Wilmington
+KI67,small_airport,Cincinnati West Airport,39.2589,-84.7743,584,,Harrison
+KI68,small_airport,Warren County Airport/John Lane Field,39.4622,-84.251801,898,,Lebanon
+KI69,small_airport,Clermont County Airport,39.0784,-84.210197,843,,Batavia
+KI73,small_airport,Moraine Air Park,39.682215,-84.239042,720,,Dayton
+KI74,small_airport,Grimes Field,40.132599,-83.753403,1068,,Urbana
+KI86,small_airport,Perry County Airport,39.691601,-82.1978,1051,,New Lexington
+KI95,small_airport,Hardin County Airport,40.610699,-83.6436,1024,,Kenton
+KILN,medium_airport,Wilmington Airpark,39.427898407,-83.792098999,1077,ILN,Wilmington
+KK62,small_airport,Gene Snyder Airport,38.704201,-84.391602,899,,Falmouth
+KLCK,medium_airport,Rickenbacker International Airport,39.813801,-82.927803,744,LCK,Columbus
+KLHQ,small_airport,Fairfield County Airport,39.7556,-82.657097,868,,Lancaster
+KLUK,medium_airport,Cincinnati Municipal Airport Lunken Field,39.102357,-84.418945,483,LUK,Cincinnati
+KMGY,small_airport,Dayton-Wright Brothers Airport,39.5890007019,-84.224899292,957,MGY,Dayton
+KMIE,medium_airport,Delaware County Johnson Field,40.242298,-85.395897,937,MIE,Muncie
+KMNN,small_airport,Marion Municipal Airport,40.6161994934,-83.06349945070001,993,MNN,Marion
+KMQJ,small_airport,Indianapolis Regional Airport,39.843498,-85.8971,862,,Indianapolis
+KMRT,small_airport,Union County Airport,40.224701,-83.351601,1021,,Marysville
+KMWO,small_airport,Middletown Regional Airport,39.530998,-84.395302,650,MWO,Middletown
+KMZZ,small_airport,Marion Municipal Airport,40.4898986816,-85.6797027588,859,MZZ,Marion
+KOSU,medium_airport,The Ohio State University Airport - Don Scott Field,40.0798,-83.072998,905,OSU,Columbus
+KOVO,small_airport,North Vernon Airport,39.045601,-85.605301,757,,North Vernon
+KOWX,small_airport,Putnam County Airport,41.035599,-83.982002,764,,Ottawa
+KOXD,small_airport,Miami University Airport,39.50230026,-84.78440094,1041,OXD,Oxford
+KPLD,small_airport,Portland Municipal Airport,40.450802,-84.990097,925,,Portland
+KPMH,small_airport,Greater Portsmouth Regional Airport,38.8404998779,-82.84729766850002,663,PMH,Portsmouth
+KR47,small_airport,Ruhes Airport,41.102526,-84.05443,801,,Leipsic
+KRID,small_airport,Richmond Municipal Airport,39.757198,-84.842796,1140,RID,Richmond
+KRZT,small_airport,Ross County Airport,39.440399,-83.023102,725,,Chillicothe
+KSGH,medium_airport,Springfield-Beckley Municipal Airport,39.840301513672,-83.840202331543,1051,SGH,Springfield
+KTZR,small_airport,Bolton Field,39.901199,-83.136902,905,,Columbus
+KUWL,small_airport,New Castle-Henry County Municipal Airport,39.8759,-85.3265,1088,,New Castle
+KUYF,small_airport,Madison County Airport,39.932701,-83.461998,1082,,London
+KVES,small_airport,Darke County Airport,40.204399,-84.531898,1007,,Versailles
+KVNW,small_airport,Van Wert County Airport,40.8647,-84.609398,785,,Van Wert
+KVTA,small_airport,Newark Heath Airport,40.024700164799995,-82.46179962160001,884,,Newark
+O74,small_airport,Elliotts Landing Airport,40.52470016479492,-83.51170349121094,1045,,Mount Victory
+OA04,small_airport,Rutter Airport,41.097599029541016,-83.50270080566406,815,,Arcadia
+OA05,small_airport,Hogan Airport,39.424198150634766,-84.65910339355469,865,,Mc Gonigle
+OA10,small_airport,Bernie's Airport,39.00859832763672,-83.9092025756836,950,,Mount Orab
+OA11,small_airport,Heitman Field,40.3760986328125,-84.25499725341797,998,,Anna
+OA12,small_airport,Buena Vista Farm Airport,39.33440017700195,-84.06999969482422,855,,Morrow
+OA16,small_airport,Lost Bridge Airport,39.156111,-84.781667,818,,North Bend
+OA51,small_airport,Fighter Field Airport,40.206111,-83.228611,980,,Watkins
+OA86,small_airport,Silent P Airport,39.907356,-83.360314,970,,West Jefferson
+OH09,small_airport,One Shot Airport,40.315067,-82.243701,1069,,Howard
+OH18,small_airport,Freefall Field,40.932498931884766,-83.14029693603516,885,,Sycamore
+OH19,small_airport,Hiltner Airport,41.154998779296875,-84.21489715576172,725,,North Creek
+OH21,small_airport,Horning Airport,40.73619842529297,-82.75270080566406,1190,,Galion
+OH28,small_airport,Donner Field,39.36669921875,-83.5999984741211,990,,Leesburg
+OH34,small_airport,Leis Airport,40.20589828491211,-84.6615982055664,1015,,Ansonia
+OH40,small_airport,Shannons Landing Airport,40.37001,-83.112233,970,,Radnor
+OH42,small_airport,Hawk's Nest Airport,40.54010009765625,-82.393798828125,1260,,Butler
+OH43,small_airport,Anderson Airport,39.83340072631836,-82.73320007324219,800,,Canal Winchester
+OH44,small_airport,Head Field Airport,40.220273,-82.946992,945,,Galena
+OH59,small_airport,McIntosh Airport,39.695991,-84.448178,914,,Farmersville
+OH60,small_airport,Gerker Airfield,40.95370101928711,-84.27359771728516,780,,Fort Jennings
+OH61,small_airport,Amanda Airport,39.63529968261719,-82.73789978027344,900,,Amanda
+OH63,small_airport,Jims Airport,39.600101470947266,-84.4166030883789,955,,Germantown
+OH64,small_airport,Hummel Airport,39.593101501464844,-84.34380340576172,695,,Germantown
+OH65,small_airport,Hickory Grove Airpark,39.240251,-84.098915,895,,Goshen
+OH66,small_airport,Obannon Creek Aerodrome,39.239498138427734,-84.17630004882812,835,,Goshen
+OH68,small_airport,Raylene Airport,39.30009841918945,-84.7499008178711,590,,Harrison
+OH71,small_airport,Chapman Memorial Field,40.29542,-82.729961,1180,,Centerburg
+OH77,small_airport,Lumberton Airport,39.553096,-83.854094,1008,,Wilmington
+OH78,small_airport,Swigart Airport,39.96760177612305,-84.40879821777344,1005,,Laura
+OH91,small_airport,Dave Rice Ultralightport,40.70009995,-84.23439789,775,,Lima
+OH92,small_airport,Porter Airport,39.954200744628906,-82.18319702148438,1070,,Hopewell
+OH93,small_airport,Darby Airport,40.14030075073242,-83.39019775390625,972,,Milford Center
+OH96,small_airport,Neals Airport,39.033599853515625,-83.88610076904297,953,,Mount Orab
+OI01,small_airport,Lazy-W Airport,39.51369857788086,-82.4489974975586,750,,Logan
+OI06,small_airport,Wagner Airport,39.991687,-84.291615,935,,West Milton
+OI25,small_airport,Ross Field,39.365299224853516,-83.35440063476562,960,,Greenfield
+OI28,small_airport,Lanker Airport,40.583900451660156,-82.6792984008789,1440,,Mount Gilead
+OI34,small_airport,Fricke Airport,39.61309814453125,-83.99240112304688,905,,Spring Valley
+OI36,small_airport,Farpoint Airfield,39.622501373291016,-84.48310089111328,990,,Gratis
+OI38,small_airport,Hillview Airstrip,40.308435,-83.613545,1400,,East Liberty
+OI40,small_airport,Hallelujah Field,39.202598571777344,-84.10469818115234,890,,Goshen
+OI49,small_airport,Flying Acres Airport,40.3838996887207,-83.10690307617188,975,,Delaware
+OI52,small_airport,Lyons Field,39.62406,-83.78364,1045,,Jamestown
+OI56,small_airport,Lee's Dogpatch Airport,39.95320129,-82.64070129,1055,,Kirkersville
+OI57,small_airport,Mc Kinney Field,38.926998138399995,-83.9885025024,970,,Hamersville
+OI73,small_airport,Williamson Airport,39.71260070800781,-83.80380249023438,1060,,Cedarville
+OI77,small_airport,Mc Ardle Airport,41.2159004211,-83.5579986572,715,,Fostoria
+OI82,small_airport,Russ Airport,38.912200927734375,-82.72489929199219,800,,Jackson
+OI85,small_airport,Mill Creek Airport,40.268398284912,-83.221603393555,960,,Ostrander
+OI89,small_airport,Mite Airport,39.64950180053711,-84.62999725341797,866,,Camden
+OI91,small_airport,Hammond Airport,39.779701232910156,-83.9092025756836,990,,Yellow Springs
+US-0111,small_airport,Boober Airport,40.09140015,-83.35910034,980,,Plain City
+US-0304,small_airport,Freeman Swank Farms Airport,40.59683,-82.43173,1071,,Butler
+US-0319,small_airport,Ronnie Cole Airstrip,39.831008,-85.72268,900,,Greenfield
+US-0320,small_airport,My Place Airport,40.478828,-82.943787,1080,,Cardington
+US-0725,small_airport,Berg Field,41.033333,-83.687777,783,,Findlay
+US-0755,small_airport,Flyers Park Airport,40.154066,-82.306906,865,,Newark
+US-0838,small_airport,White Oak Field,40.338962,-82.7723125,1169,,Centerburg
+US-0861,small_airport,Sky Ranch Airport,39.935451,-83.236398,920,,Galloway
+US-0871,small_airport,Oakhaus Landing Airport,40.353855,-83.5239,1083,,Raymond
+US-1110,small_airport,Old Boston Airport,39.027504,-84.046835,896,,Williamsburg
+US-12752,small_airport,Tailwheel Lane Airport,39.646682,-82.848861,1034,,Circleville
+US-1277,small_airport,Dungan Airport,39.719401,-85.269278,1064,,Connersville
+US-1283,small_airport,Spangler Farm Airport,41.012639,-84.877694,776,,Fort Wayne
+US-13024,small_airport,Jackson Field,40.273402,-85.479582,901,,Muncie
+US-1954,small_airport,Huber Field,40.313975,-84.181046,1040,,Sidney
+US-1958,small_airport,McPherson Airfield,39.136265,-85.146092,959,,Milan
+US-2037,small_airport,Herbs Field,38.912086,-84.905197,802,,Rising Sun
+US-3047,small_airport,Socks Flyers Airport,38.883619,-84.257711,625,,California
+US-3719,small_airport,Bob Jenkins,40.43,-82.7,1296,,
+US-4219,small_airport,Versailles Airport,39.05985,-85.24456,971,,Versailles
+US-4485,small_airport,Williams Flying Field,39.236882,-85.693241,745,,Hartsville
+US-4492,small_airport,Pfeiffer Field,39.521125,-84.628292,806,,Collinsville
+US-4493,small_airport,Aerodrome Les Noyers,39.680353,-83.744672,1085,,Jamestown
+US-5382,small_airport,Strable Landing Strip Airport,41.204516,-84.496159,714,,Cecil
+US-5649,small_airport,Scudder Field,38.918164,-84.974235,905,,Rising Sun
+US-5652,small_airport,Hickerson Airport,39.939297,-83.902082,1050,,Springfield
+US-6427,small_airport,Beam Farms Airport,39.501988,-83.711786,1095,,Sabina
+US-6573,small_airport,Warped Wing Airport,40.159569,-82.73766,1130,,Johnstown
+US-7347,small_airport,Hagerty Airport,40.97172,-83.54853,806,,Findlay
+US-7558,small_airport,Sunny Ridge Landing,38.806389,-84.556944,875,,Crittenden
+US-7839,small_airport,Schleter Field,39.805053,-85.854811,860,,Greenfield
+US-8437,small_airport,Old Glory Field,41.031901,-85.031701,796,,Fort Wayne
+US-8588,small_airport,Dewey Drome,39.68214,-83.74645,1063,,Jamestown
+US-8589,small_airport,Kilbarger Airport,39.67902,-83.74279,1064,,Jamestown
+US-9148,small_airport,Kathamel Airport,40.288042,-84.473654,991,,Versailles
+US-9311,small_airport,WesMar Aerodrome,39.70313,-83.13021,808,,Orient

@@ -1,0 +1,183 @@
+"""Sky View over Fairborn, OH -- FastAPI app serving a live overhead sky chart.
+
+Run:
+    .venv/Scripts/python.exe -m uvicorn skyview.main:app --reload --port 8000
+Then open http://127.0.0.1:8000
+
+Data: adsb.fi open data (public endpoint, no key, 1 req/sec limit).
+      Non-commercial use only; cite https://adsb.fi
+"""
+
+from __future__ import annotations
+
+import math
+import os
+import time
+from collections import deque
+from pathlib import Path
+
+import httpx
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, JSONResponse
+
+from . import airports as apt
+
+# Fairborn, Ohio
+FAIRBORN_LAT = 39.8209
+FAIRBORN_LON = -84.0194
+DEFAULT_RADIUS_NM = 60
+
+UPSTREAMS = [
+    ("adsb.fi", "https://opendata.adsb.fi/api/v2/lat/{lat}/lon/{lon}/dist/{dist}", "aircraft"),
+    ("adsb.lol", "https://api.adsb.lol/v2/point/{lat}/{lon}/{dist}", "ac"),
+]
+
+# Local readsb/dump1090 feed. Set READSB_URL to use your own receiver instead of
+# the aggregators -- same aircraft.json schema, ~1s latency, no rate limit.
+READSB_URL = os.environ.get("READSB_URL")
+
+STATIC_DIR = Path(__file__).parent / "static"
+
+app = FastAPI(title="Sky View over Fairborn")
+
+_cache: dict[str, object] = {"at": 0.0, "payload": None}
+CACHE_SECONDS = 4.0  # stay under adsb.fi's 1 req/sec even with many viewers
+
+# The upstreams serve snapshots, not history -- there is no public trace endpoint.
+# So we accumulate our own track per aircraft, one point per poll.
+TRACK_POINTS = 120        # ~10 min of history at a 5s poll
+TRACK_TTL_SECONDS = 900   # forget an aircraft 15 min after it drops out
+_tracks: dict[str, deque] = {}
+_track_seen: dict[str, float] = {}
+
+
+def _record_tracks(rows: list[dict], now: float) -> None:
+    for a in rows:
+        hex_id = a.get("hex")
+        lat, lon = a.get("lat"), a.get("lon")
+        if not hex_id or lat is None or lon is None:
+            continue
+        track = _tracks.get(hex_id)
+        if track is None:
+            track = _tracks[hex_id] = deque(maxlen=TRACK_POINTS)
+        # Skip duplicate positions so a parked/hovering aircraft doesn't fill
+        # the buffer with identical points.
+        if track and track[-1][0] == lat and track[-1][1] == lon:
+            _track_seen[hex_id] = now
+            continue
+        track.append((lat, lon, a.get("alt_baro"), now))
+        _track_seen[hex_id] = now
+
+    for hex_id, seen in list(_track_seen.items()):
+        if now - seen > TRACK_TTL_SECONDS:
+            _track_seen.pop(hex_id, None)
+            _tracks.pop(hex_id, None)
+
+
+async def _fetch_upstream(client: httpx.AsyncClient) -> tuple[str, list[dict]]:
+    if READSB_URL:
+        response = await client.get(READSB_URL, timeout=8.0)
+        response.raise_for_status()
+        return "local readsb", response.json().get("aircraft", [])
+
+    errors = []
+    for name, template, key in UPSTREAMS:
+        url = template.format(lat=FAIRBORN_LAT, lon=FAIRBORN_LON, dist=DEFAULT_RADIUS_NM)
+        try:
+            response = await client.get(url, timeout=8.0)
+            response.raise_for_status()
+            return name, response.json().get(key) or []
+        except Exception as exc:  # try the next mirror
+            errors.append(f"{name}: {exc}")
+    raise HTTPException(status_code=502, detail="All upstreams failed: " + "; ".join(errors))
+
+
+def _polar(lat: float, lon: float) -> tuple[float, float]:
+    """Bearing (deg true) and distance (nm) from Fairborn to a point.
+
+    Equirectangular approximation -- accurate well within a degree at these
+    ranges, and far cheaper than haversine for every point of every track.
+    """
+    lat_rad = math.radians((lat + FAIRBORN_LAT) / 2)
+    dy = (lat - FAIRBORN_LAT) * 60.0
+    dx = (lon - FAIRBORN_LON) * 60.0 * math.cos(lat_rad)
+    bearing = (math.degrees(math.atan2(dx, dy)) + 360.0) % 360.0
+    return bearing, math.hypot(dx, dy)
+
+
+def _clean(rows: list[dict]) -> list[dict]:
+    """Keep airborne contacts that have a usable position."""
+    out = []
+    for a in rows:
+        alt = a.get("alt_baro")
+        if alt == "ground":
+            continue
+        if a.get("lat") is None or a.get("lon") is None:
+            continue
+        out.append(
+            {
+                "hex": a.get("hex"),
+                "flight": (a.get("flight") or "").strip() or None,
+                "reg": a.get("r"),
+                "type": a.get("t"),
+                "desc": a.get("desc"),
+                "operator": a.get("ownOp"),
+                "alt": alt if isinstance(alt, (int, float)) else None,
+                "gs": a.get("gs"),
+                "track": a.get("track"),
+                "baro_rate": a.get("baro_rate"),
+                "squawk": a.get("squawk"),
+                "emergency": a.get("emergency"),
+                "dst": a.get("dst"),
+                "dir": a.get("dir"),
+                "category": a.get("category"),
+                # Intent, not just state: the altitude the crew has dialled in,
+                # and the autopilot modes they have armed.
+                "nav_alt": a.get("nav_altitude_mcp"),
+                "nav_modes": a.get("nav_modes") or [],
+                "rc": a.get("rc"),
+                "approach": apt.approach_for(
+                    a.get("lat"), a.get("lon"),
+                    alt if isinstance(alt, (int, float)) else None,
+                    a.get("track"), a.get("baro_rate"),
+                ),
+                "mlat": bool(a.get("mlat")),
+                "seen_pos": a.get("seen_pos"),
+                "track_pts": [
+                    {"dir": b, "dst": d, "alt": alt_p}
+                    for b, d, alt_p in (
+                        (*_polar(pt[0], pt[1]), pt[2]) for pt in _tracks.get(a.get("hex"), ())
+                    )
+                ],
+            }
+        )
+    out.sort(key=lambda a: a["dst"] if a["dst"] is not None else 9e9)
+    return out
+
+
+@app.get("/api/flights")
+async def flights():
+    now = time.time()
+    if _cache["payload"] is not None and now - float(_cache["at"]) < CACHE_SECONDS:
+        return _cache["payload"]
+
+    async with httpx.AsyncClient(headers={"User-Agent": "skyview-fairborn/1.0"}) as client:
+        source, rows = await _fetch_upstream(client)
+
+    _record_tracks(rows, now)
+
+    payload = {
+        "now": now,
+        "source": source,
+        "center": {"lat": FAIRBORN_LAT, "lon": FAIRBORN_LON, "name": "Fairborn, OH"},
+        "radius_nm": DEFAULT_RADIUS_NM,
+        "aircraft": _clean(rows),
+    }
+    _cache["at"] = now
+    _cache["payload"] = payload
+    return JSONResponse(payload)
+
+
+@app.get("/")
+async def index():
+    return FileResponse(STATIC_DIR / "index.html")
