@@ -49,9 +49,31 @@
     background:
       radial-gradient(ellipse at 50% 45%, var(--field) 0%, var(--ground) 70%);
   }
-  #sky { width: min(100%, 100vh); height: auto; max-height: 100%; display: block; }
+  #sky { width: min(100%, 100vh); height: auto; max-height: 100%; display: block;
+         position: relative; z-index: 2; }
+
+  /* Street map sits behind the chart, clipped to the outer ring so the scope
+     still reads as a scope. OSM ships light-on-white, so invert and desaturate
+     it into dim grey rather than a glowing white disc in a dark room. */
+  #mapwrap {
+    position: absolute; z-index: 1;
+    pointer-events: none;
+    border-radius: 50%; overflow: hidden;
+  }
+  #map {
+    display: block; width: 100%; height: 100%;
+    filter: invert(1) grayscale(1) brightness(1.5) contrast(.62);
+    opacity: .62;
+  }
+  #map-attr {
+    position: absolute; right: 8px; bottom: 5px;
+    font-size: 8px; color: var(--ink-faint); opacity: .75;
+    font-family: var(--ui);
+  }
 
   .ring { fill: none; stroke: var(--ring-faint); stroke-width: 1; }
+  .with-map .ring { stroke: #3D4A6B; }
+  .with-map .spoke { stroke: #2C3652; }
   .ring.major { stroke: var(--ring); }
   .ring-label {
     fill: var(--ink-faint); font-family: var(--mono); font-size: 9px;
@@ -339,6 +361,10 @@
 <body>
 <div id="app">
   <div id="sky-wrap">
+    <div id="mapwrap" hidden>
+      <canvas id="map"></canvas>
+      <div id="map-attr">&copy; OpenStreetMap contributors</div>
+    </div>
     <svg id="sky" viewBox="0 0 560 560" role="img" aria-label="Overhead sky chart of aircraft near Fairborn, Ohio">
       <g id="grid"></g>
       <g id="planes"></g>
@@ -414,6 +440,7 @@
     <div class="ctl-row">
       <button type="button" class="chip on" id="mirror" aria-pressed="true">mirrored</button>
       <button type="button" class="chip on" id="gridtog" aria-pressed="true">grid</button>
+      <button type="button" class="chip" id="maptog" aria-pressed="false" title="Street map, map view only">streets</button>
       <button type="button" class="chip" id="reset">reset</button>
     </div>
 
@@ -562,6 +589,125 @@
     var a = ((mirrored ? -b : b) - 90) * Math.PI / 180;
     return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
   }
+
+  /* ---- street map layer ----------------------------------------------
+     Tiles are Web Mercator squares; the chart is polar. We draw a square
+     canvas covering exactly the outer ring's extent, then clip it to a circle
+     with CSS. Only shown in map view -- a mirrored (looking-up) chart would
+     need mirrored geography, which a street map cannot honestly provide. */
+  var TILE = 256;
+  var showMap = false;
+  var mapWrap = document.getElementById("mapwrap");
+  var mapCanvas = document.getElementById("map");
+  var tileCache = {};
+  var mapToken = 0;
+
+  function lonToX(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
+  function latToY(lat, z) {
+    var r = lat * Math.PI / 180;
+    return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+  }
+
+  function pickZoom(spanNm, pixels) {
+    // Choose the zoom whose pixel scale best matches the chart's.
+    var spanDeg = spanNm / 60 / Math.cos(centre.lat * Math.PI / 180);
+    for (var z = 16; z >= 3; z--) {
+      var worldPx = Math.pow(2, z) * TILE;
+      if (spanDeg / 360 * worldPx <= pixels * 1.6) return z;
+    }
+    return 3;
+  }
+
+  function drawMap() {
+    var on = showMap && !mirrored;
+    document.getElementById("sky-wrap").classList.toggle("with-map", on);
+    if (!on) { mapWrap.hidden = true; return; }
+    mapWrap.hidden = false;
+
+    var rect = document.getElementById("sky").getBoundingClientRect();
+    // The outer ring is R/280 of the SVG's half-width.
+    var diameter = rect.width * (R / 280);
+    var size = Math.max(64, Math.round(diameter));
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    mapWrap.style.width = size + "px";
+    mapWrap.style.height = size + "px";
+    mapWrap.style.left = Math.round(rect.left + (rect.width - size) / 2) + "px";
+    mapWrap.style.top = Math.round(rect.top + (rect.height - size) / 2) + "px";
+    mapWrap.style.position = "fixed";
+
+    mapCanvas.width = Math.round(size * dpr);
+    mapCanvas.height = Math.round(size * dpr);
+    var ctx = mapCanvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, size, size);
+
+    var z = pickZoom(MAX_NM * 2, size);
+    var scale = Math.pow(2, z) * TILE;
+    // Nautical miles -> degrees, then -> world pixels at this zoom.
+    var halfLatDeg = MAX_NM / 60;
+    var north = latToY(centre.lat + halfLatDeg, z) * TILE;
+    var south = latToY(centre.lat - halfLatDeg, z) * TILE;
+    var pxPerSide = south - north;                  // world px spanning the chart
+    var cxPx = lonToX(centre.lon, z) * TILE;
+    var cyPx = latToY(centre.lat, z) * TILE;
+    var ratio = size / pxPerSide;                   // canvas px per world px
+    var originX = cxPx - (size / 2) / ratio;
+    var originY = cyPx - (size / 2) / ratio;
+
+    var token = ++mapToken;
+    var x0 = Math.floor(originX / TILE), x1 = Math.floor((originX + size / ratio) / TILE);
+    var y0 = Math.floor(originY / TILE), y1 = Math.floor((originY + size / ratio) / TILE);
+    var maxIdx = Math.pow(2, z);
+
+    // Rotation is applied around the canvas centre so the map turns with the chart.
+    if (rotation) {
+      ctx.save();
+      ctx.translate(size / 2, size / 2);
+      ctx.rotate(-rotation * Math.PI / 180);
+      ctx.translate(-size / 2, -size / 2);
+    }
+
+    for (var tx = x0; tx <= x1; tx++) {
+      for (var ty = y0; ty <= y1; ty++) {
+        if (ty < 0 || ty >= maxIdx) continue;
+        var wrapped = ((tx % maxIdx) + maxIdx) % maxIdx;
+        var key = z + "/" + wrapped + "/" + ty;
+        var dx = (tx * TILE - originX) * ratio;
+        var dy = (ty * TILE - originY) * ratio;
+        var dsize = TILE * ratio;
+        var img = tileCache[key];
+        if (img && img.complete && img.naturalWidth) {
+          ctx.drawImage(img, dx, dy, dsize, dsize);
+        } else if (!img) {
+          img = new Image();
+          img.crossOrigin = "anonymous";
+          img.referrerPolicy = "no-referrer";
+          tileCache[key] = img;
+          (function (d1, d2, d3, tk) {
+            img.onload = function () {
+              // Ignore tiles that arrive after the view moved on.
+              if (tk !== mapToken) return;
+              var c = mapCanvas.getContext("2d");
+              c.setTransform(dpr, 0, 0, dpr, 0, 0);
+              if (rotation) {
+                c.save();
+                c.translate(size / 2, size / 2);
+                c.rotate(-rotation * Math.PI / 180);
+                c.translate(-size / 2, -size / 2);
+              }
+              c.drawImage(this, d1, d2, d3, d3);
+              if (rotation) c.restore();
+            };
+          })(dx, dy, dsize, token);
+          img.src = "https://tile.openstreetmap.org/" + z + "/" + wrapped + "/" + ty + ".png";
+        }
+      }
+    }
+    if (rotation) ctx.restore();
+  }
+
+  window.addEventListener("resize", function () { drawMap(); });
 
   function ringSteps() {
     // Pick a round ring interval that yields roughly four rings at any radius.
@@ -946,6 +1092,7 @@
   function redraw() {
     grid.textContent = "";
     drawGrid();
+    drawMap();
     render(lastAircraft);
   }
 
@@ -1029,6 +1176,7 @@
     lastAircraft = [];
     render([]);
     statusEl.textContent = "moving…";
+    drawMap();
     tick();
   }
 
@@ -1128,6 +1276,31 @@
     redraw();
   });
 
+  var mapTog = document.getElementById("maptog");
+
+  function syncMapChip() {
+    // Streets are meaningless in the mirrored (looking-up) view, so the chip
+    // disables itself there rather than silently doing nothing.
+    mapTog.classList.toggle("on", showMap && !mirrored);
+    mapTog.setAttribute("aria-pressed", String(showMap && !mirrored));
+    mapTog.classList.toggle("off-state", mirrored);
+    mapTog.title = mirrored
+      ? "Switch to map view to show streets"
+      : "Street map under the chart";
+  }
+
+  mapTog.addEventListener("click", function () {
+    if (mirrored) {
+      // Turning streets on implies you want to look down.
+      mirrorEl.click();
+      showMap = true;
+    } else {
+      showMap = !showMap;
+    }
+    syncMapChip();
+    drawMap();
+  });
+
   gridTog.addEventListener("click", function () {
     showGrid = !showGrid;
     gridTog.classList.toggle("on", showGrid);
@@ -1160,6 +1333,7 @@
     document.querySelector(".mirror-note").innerHTML = mirrored
       ? "mirrored view — you are<br>facing up, head to north.<br>east sits to your left."
       : "map view — north up,<br>east right, as drawn<br>on a chart.";
+    syncMapChip();
     redraw();
   });
 
@@ -1170,10 +1344,12 @@
       document.getElementById("loc-name").textContent + " · 60 nm";
     document.querySelector("#n-near").nextElementSibling.textContent = "Within 15 nm";
     if (!showGrid) { showGrid = true; gridTog.classList.add("on"); gridTog.setAttribute("aria-pressed","true"); }
+    showMap = false; syncMapChip();
     if (!mirrored) mirrorEl.click(); else redraw();
   });
 
   buildChips();
+  syncMapChip();
   drawGrid();
   drawLegend();
   tick();

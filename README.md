@@ -45,6 +45,27 @@ chart still works, but the location shows as bare coordinates and no approach
 matching happens. Re-run `scripts/refresh_airports.py` with different
 constants to move that box.
 
+## Street map
+
+The **streets** chip draws OpenStreetMap tiles under the chart, clipped to the
+outer ring. It only applies in map view -- a mirrored looking-up chart would
+need mirrored geography, which a street map cannot honestly provide, so
+clicking the chip while mirrored switches to map view first.
+
+Tiles are OSM's standard light style, inverted and desaturated in CSS to a dim
+grey so they read in an unlit room without competing with the traffic. The
+canvas is sized so its extent matches the outer ring exactly, and it rotates
+with the chart.
+
+Tiles come straight from tile.openstreetmap.org (they send
+`access-control-allow-origin: *`, so no proxy is needed). Respect the
+[OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+-- it is fine for personal use at this volume, but heavy or automated use
+should run its own tile source. Attribution is shown on the map.
+
+Carto's basemaps were the first choice for a dark UI, but they now watermark
+unkeyed tiles with "API KEY REQUIRED".
+
 ## Tracks
 
 The upstreams serve snapshots, not history, and there is no public trace
