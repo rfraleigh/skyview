@@ -45,6 +45,20 @@ chart still works, but the location shows as bare coordinates and no approach
 matching happens. Re-run `scripts/refresh_airports.py` with different
 constants to move that box.
 
+## Projector mode
+
+The **projector** chip switches the chart to high-contrast, large type for
+ceiling projection, and remembers the choice per browser.
+
+A projector adds light and cannot subtract it, so black renders as whatever
+the surface already is -- a beige ceiling stays beige. Every "dim it for a
+dark room" choice that helps on a monitor works against you there. Projector
+mode drops the dimming: callsigns go to 15px pure white with a heavy black
+outline, the compass to 23px, rings and spokes brighten, aircraft glyphs grow
+45%, and the street map falls back to 26% opacity so it stops competing with
+the labels at the same luminance. Label de-confliction spacing scales with
+the larger type.
+
 ## Street map
 
 The **streets** chip draws OpenStreetMap tiles under the chart, clipped to the
