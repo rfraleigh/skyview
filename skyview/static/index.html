@@ -389,7 +389,7 @@
       <h1>Sky View over Fairborn</h1>
       <button type="button" id="rail-close" aria-label="Close traffic list">&times;</button>
     </div>
-    <p class="sub" id="sub-coords">39.82°N 84.02°W · 60 nm</p>
+    <p class="sub" id="sub-coords">39.78°N 84.04°W · 60 nm</p>
     <div class="stats">
       <div><div class="stat-n" id="n-total">—</div><div class="stat-l">Overhead</div></div>
       <div><div class="stat-n" id="n-near">—</div><div class="stat-l">Within 15 nm</div></div>
@@ -415,8 +415,8 @@
       <div class="ctl-l"><span>Location</span><span class="ctl-v" id="loc-name">Fairborn, OH</span></div>
       <form id="loc-form" autocomplete="off">
         <div class="loc-row">
-          <input type="text" id="loc-lat" inputmode="decimal" aria-label="Latitude" placeholder="lat" value="39.8209">
-          <input type="text" id="loc-lon" inputmode="decimal" aria-label="Longitude" placeholder="lon" value="-84.0194">
+          <input type="text" id="loc-lat" inputmode="decimal" aria-label="Latitude" placeholder="lat" value="39.7792142">
+          <input type="text" id="loc-lon" inputmode="decimal" aria-label="Longitude" placeholder="lon" value="-84.0399195">
           <button type="submit" class="chip" id="loc-go">go</button>
         </div>
         <div class="loc-err" id="loc-err" hidden></div>
@@ -464,7 +464,7 @@
   var SVG = "http://www.w3.org/2000/svg";
   var CX = 280, CY = 280, R = 246;
   var MAX_NM = 60;        // view radius, driven by the Radius slider
-  var HOME = { lat: 39.8209, lon: -84.0194 };
+  var HOME = { lat: 39.7792142, lon: -84.0399195 };
   var centre = { lat: HOME.lat, lon: HOME.lon };
   var showGrid = true;
   var POLL_MS = 5000;

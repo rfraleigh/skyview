@@ -10,7 +10,7 @@ import math
 import urllib.request
 from pathlib import Path
 
-LAT, LON = 39.8209, -84.0194
+LAT, LON = 39.7792142, -84.0399195
 BOX_NM = 90
 BASE = "https://davidmegginson.github.io/ourairports-data/"
 OUT = Path(__file__).resolve().parent.parent / "skyview" / "data"
@@ -28,7 +28,11 @@ def nm(lat, lon):
 
 
 def fetch(name):
-    with urllib.request.urlopen(BASE + name, timeout=60) as response:
+    # The CDN rejects urllib's default user-agent with a connection reset.
+    request = urllib.request.Request(
+        BASE + name, headers={"User-Agent": "skyview-fairborn/1.0"}
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:
         return csv.DictReader(io.StringIO(response.read().decode("utf-8")))
 
 

@@ -23,8 +23,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from . import airports as apt
 
 # Fairborn, Ohio
-FAIRBORN_LAT = 39.8209
-FAIRBORN_LON = -84.0194
+FAIRBORN_LAT = 39.7792142
+FAIRBORN_LON = -84.0399195
 # Fetch wide once; the UI filters to the radius the viewer selects. This keeps
 # radius changes instant and costs no extra upstream calls.
 FETCH_RADIUS_NM = 120

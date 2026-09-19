@@ -7,7 +7,6 @@ ident,type,name,latitude_deg,longitude_deg,elevation_ft,iata_code,municipality
 0II0,small_airport,Chuck's Airport,40.258381,-85.253348,955,,Albany
 0II7,small_airport,Frost Field,39.79560089111328,-85.78610229492188,900,,Greenfield
 0IN2,small_airport,The Lazy K Airport,40.82780075073242,-85.08609771728516,835,,Tocsin
-0IN4,small_airport,Air Park Field,41.127405,-84.953306,750,,New Haven
 0KY0,small_airport,Owen Air Park,38.622798919677734,-84.77890014648438,890,,Owenton
 0OH6,small_airport,Fry Field,39.60060119628906,-84.01969909667969,775,,Spring Valley
 0OH8,small_airport,Fry Airport,40.18840026855469,-84.256103515625,900,,Piqua
@@ -158,6 +157,7 @@ I19,small_airport,Greene County/Lewis A. Jackson Regional Airport,39.690807,-83.
 I44,small_airport,Dahio Trotwood Airport,39.765072,-84.343166,925,,Dayton
 I61,small_airport,Hagerstown Airport,39.889198303222656,-85.16329956054688,1000,,Hagerstown
 I62,small_airport,Schaney's Lair Airport,39.859839,-84.435192,1037,,Brookville
+I80,small_airport,Noblesville Airport,40.003601074219,-85.964698791504,821,,Noblesville
 I99,small_airport,Alexandria Airport,40.232498,-85.637497,900,,Alexandria
 IG04,small_airport,Litzinger Ultralightport,39.046101,-85.1567,970,,Milan
 IG07,small_airport,Josephs Field,39.05690002441406,-85.03559875488281,860,,Moores Hill
